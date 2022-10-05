@@ -94,6 +94,17 @@ class VehilceController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   getAllReviews = async (req, res, next) => {
+      try {
+         res.json({
+            allReviews: await VehicleService.findAllVehicleReview(),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
 }
 
 module.exports = new VehilceController();

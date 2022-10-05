@@ -10,6 +10,8 @@ const VehicleController = require("../app/controllers/VehicleController");
 
 router.get("/list", VehicleController.findAllVehicle);
 
+router.get("/reviews", VehicleController.getAllReviews);
+
 router.put(
    "/update/:id",
    isAuthenticatedUser,

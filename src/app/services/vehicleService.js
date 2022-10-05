@@ -74,3 +74,20 @@ exports.addVehicleReview = async (vehicleId, review) => {
    vehicle.ratings = (avg / vehicle.reviews.length).toFixed();
    return await vehicle.save({ validateBeforeSave: false });
 };
+
+exports.findAllVehicleReview = async vehicleId => {
+   const vehicles = await Vehicle.find().lean();
+
+   let AllReviews = [];
+
+   vehicles.map(vehicle => {
+      vehicle.reviews &&
+         vehicle.reviews.map(rv => {
+            rv.vehicleName = vehicle.name;
+            rv.vehicleId = vehicle._id;
+            AllReviews.push(rv);
+         });
+   });
+
+   return AllReviews;
+};
