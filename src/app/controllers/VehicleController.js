@@ -119,6 +119,21 @@ class VehilceController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   deleteReviewVehicle = async (req, res, next) => {
+      try {
+         await VehicleService.deleteReview(
+            req.body.vehicleId,
+            req.body.reviewId,
+         );
+         res.json({
+            success: true,
+            message: "Delete success",
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
 }
 
 module.exports = new VehilceController();

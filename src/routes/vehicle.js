@@ -25,6 +25,13 @@ router.get(
    VehicleController.getAllReviews,
 );
 
+router.delete(
+   "/review/delete",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   VehicleController.deleteReviewVehicle,
+);
+
 router.get(
    "/review/search",
    isAuthenticatedUser,

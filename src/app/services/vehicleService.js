@@ -109,8 +109,37 @@ exports.searchReviewsByNameVehicle = async keyword => {
             allReviews.push(rv);
          });
    });
-
    return { allReviews, countReviews: allReviews.length };
 };
 
-exports.deleteReview = async keyword => {};
+exports.deleteReview = async (vehicleId, reviewId) => {
+   const vehicle = await Vehicle.findById(vehicleId).lean();
+
+   if (!vehicle) {
+      throw new Error("Vehilce not found");
+   }
+
+   const reviews = vehicle.reviews.filter(
+      rev => rev._id.toString() !== reviewId,
+   );
+
+   let avg = 0;
+
+   reviews.forEach(rev => {
+      avg += rev.rating;
+   });
+
+   const numOfReviews = reviews.length || 0;
+
+   let ratings = 0;
+
+   if (numOfReviews) {
+      ratings = (avg / reviews.length).toFixed();
+   }
+
+   return await Vehicle.findByIdAndUpdate(vehicleId, {
+      reviews,
+      ratings,
+      numOfReviews,
+   });
+};
