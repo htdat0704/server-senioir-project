@@ -83,7 +83,7 @@ class UserController {
          }
 
          const random = Math.floor(Math.random() * 100000000000000000);
-         const requestPasswordUrl = `${process.env.URL_WEBSITE}/auth/password/reset/${random}`;
+         const requestPasswordUrl = `${process.env.URL_WEBSITE}/user/password/reset/${random}`;
 
          const message = `Your password reset token is :- \n\n ${requestPasswordUrl} \n\n If you have not requested this email then, please ignore it`;
 
