@@ -1,17 +1,21 @@
 const User = require("../model/User");
 
-exports.findByEmail = async email => {
-   return await User.findOne({ email });
+exports.findByEmail = email => {
+   return User.findOne({ email });
 };
 
-exports.registerUser = async (
+exports.findById = async id => {
+   return User.findById(id);
+};
+
+exports.registerUser = (
    name,
    email,
    hashedPassword,
    avatar = "img",
    idImage = "id_img",
 ) => {
-   const user = await User({
+   const user = new User({
       name,
       email,
       password: hashedPassword,
@@ -20,23 +24,23 @@ exports.registerUser = async (
          url: avatar,
       },
    });
-   return await user.save();
+   return user.save();
 };
 
-exports.foundUserWithPassowrd = async email => {
-   return await User.findOne({ email: email }).select("+password");
+exports.foundUserWithPassowrd = email => {
+   return User.findOne({ email: email }).select("+password");
 };
 
-exports.resetPasswordToken = async (email, resetPasswordToken) => {
-   return await User.findOneAndUpdate(
+exports.resetPasswordToken = (email, resetPasswordToken) => {
+   return User.findOneAndUpdate(
       { email: email },
       { resetPasswordToken: resetPasswordToken },
       { new: true },
    );
 };
 
-exports.resetPassword = async (idUser, hashedPassword) => {
-   return await User.findByIdAndUpdate(
+exports.resetPassword = (idUser, hashedPassword) => {
+   return User.findByIdAndUpdate(
       idUser,
       {
          password: hashedPassword,
@@ -46,7 +50,7 @@ exports.resetPassword = async (idUser, hashedPassword) => {
    );
 };
 
-exports.addGoogleUser = async (
+exports.addGoogleUser = (
    id,
    email,
    password,
@@ -55,7 +59,7 @@ exports.addGoogleUser = async (
    displayName,
    profilePhoto,
 ) => {
-   const user = await User({
+   const user = new User({
       name: displayName,
       email,
       password,
@@ -69,5 +73,31 @@ exports.addGoogleUser = async (
          lastName: lastName,
       },
    });
-   return await user.save();
+   return user.save();
+};
+
+exports.getUserDetail = idUser => {
+   return User.findById(idUser);
+};
+
+exports.updatePassword = (idUser, hashPassowrd) => {
+   return User.findByIdAndUpdate(
+      idUser,
+      { password: hashPassowrd },
+      { new: true },
+   );
+};
+
+exports.updateProfile = (idUser, body) => {
+   return User.findByIdAndUpdate(idUser, body, {
+      new: true,
+   });
+};
+
+exports.deleteUser = user => {
+   return user.delete();
+};
+
+exports.findAllUser = () => {
+   return User.find();
 };

@@ -1,0 +1,74 @@
+const argon2 = require("argon2");
+const jwt = require("jsonwebtoken");
+const cloundinary = require("cloudinary");
+
+const VehicleService = require("../services/vehicleService");
+const ErrorHander = require("../../utils/errorhandler");
+
+class VehilceController {
+   findAllVehicle = async (req, res, next) => {
+      try {
+         let result = { vehicles: "", filterCountProducts: 0, VehicleCount: 0 };
+
+         result = await VehicleService.findAllVehicle(
+            req.query,
+            req.body.resultPerPage,
+         );
+
+         res.json({
+            ...result,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   createVehicle = async (req, res, next) => {
+      try {
+         const vehicle = await VehicleService.createNewVehicle(req.body);
+
+         res.json({
+            vehicle,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   updateVehilce = async (req, res, next) => {
+      try {
+         const vehicle = await VehicleService.updateVehicle(
+            req.params.id,
+            req.body,
+         );
+         if (!vehicle) {
+            return next(new ErrorHander("vehicle not found", 400));
+         }
+         res.json({
+            vehicle,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   deleteVehicle = async (req, res, next) => {
+      try {
+         const vehicleFound = await VehicleService.findById(req.params.id);
+         if (!vehicleFound) {
+            return next(new ErrorHander("vehicle not found", 400));
+         }
+         await VehicleService.deleteVehicle(vehicleFound);
+         res.json({
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+}
+
+module.exports = new VehilceController();

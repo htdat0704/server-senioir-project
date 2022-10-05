@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 const cloundinary = require("cloudinary");
 const passport = require("passport");
 
-const User = require("../model/User");
 const UserService = require("../services/userService");
 const ErrorHander = require("../../utils/errorhandler");
 const sendEmail = require("../../utils/sendEmail");
+const sendToken = require("../../utils/sendToken");
 
 class UserController {
    login = async (req, res, next) => {
@@ -33,11 +33,7 @@ class UserController {
             process.env.ACCESS_TOKEN_SECRET,
          );
 
-         res.json({
-            success: true,
-            user: userFound,
-            token: accessToken,
-         });
+         sendToken(userFound, accessToken, res);
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
@@ -60,17 +56,13 @@ class UserController {
             email,
             hashedPassword,
          );
-         console.log(userFound);
+
          const accessToken = jwt.sign(
             { userId: userFound._id },
             process.env.ACCESS_TOKEN_SECRET,
          );
 
-         res.json({
-            success: true,
-            user: userFound,
-            token: accessToken,
-         });
+         sendToken(userFound, accessToken, res);
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
@@ -87,7 +79,7 @@ class UserController {
          let userFound = await UserService.findByEmail(email);
 
          if (!userFound) {
-            return next(new ErrorHander("Email does not exist", 401));
+            return next(new ErrorHander("Email not found", 400));
          }
 
          const random = Math.floor(Math.random() * 100000000000000000);
@@ -142,6 +134,131 @@ class UserController {
          successRedirect: "/auth/login/success",
          failureRedirect: "/auth/login/fail",
       });
+   };
+
+   getUserDetail = async (req, res, next) => {
+      try {
+         const user = await UserService.getUserDetail(req.user._id);
+
+         res.json({
+            user,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   updatePassword = async (req, res, next) => {
+      const { newPassword, confirmPassword, oldPassword } = req.body;
+
+      if (newPassword !== confirmPassword) {
+         return next(new ErrorHander("Password did not match", 403));
+      }
+
+      try {
+         let userFound = await UserService.foundUserWithPassowrd(
+            req.user.email,
+         );
+
+         const passwordValid = await argon2.verify(
+            userFound.password,
+            oldPassword,
+         );
+
+         if (!passwordValid) {
+            return next(new ErrorHander("Old password did not match", 403));
+         }
+
+         const hashPassowrd = await argon2.hash(newPassword);
+
+         userFound = await UserService.updatePassword(
+            req.user._id,
+            hashPassowrd,
+         );
+
+         res.json({
+            success: true,
+            user: userFound,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   updateProfile = async (req, res, next) => {
+      try {
+         const user = await UserService.updateProfile(req.user._id, req.body);
+
+         res.json({
+            success: true,
+            user,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   getAllUser = async (req, res, next) => {
+      try {
+         const users = await UserService.findAllUser();
+
+         res.json({
+            success: true,
+            users,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   getSingleUser = async (req, res, next) => {
+      try {
+         if (!req.params.id) {
+            return next(new ErrorHander("Id User not available", 402));
+         }
+
+         const userFound = await UserService.findById(req.params.id);
+
+         if (!userFound) {
+            return next(new ErrorHander("user not found", 400));
+         }
+
+         res.json({
+            user: userFound,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   deleteUser = async (req, res, next) => {
+      try {
+         const foundUser = await UserService.findById(req.params.id);
+
+         if (!foundUser) {
+            return next(new ErrorHander("User not found", 400));
+         }
+         await UserService.deleteUser(foundUser);
+         res.json({
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   updateUserAdmin = async (req, res, next) => {
+      try {
+         const user = await UserService.updateProfile(req.params.id, req.body);
+         if (!user) {
+            return next(new ErrorHander("User not found", 400));
+         }
+         res.json({ success: true, user });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
    };
 }
 

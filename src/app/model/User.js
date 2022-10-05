@@ -44,7 +44,7 @@ const UserSchema = new mongoose.Schema({
    },
    driverLicense: [
       {
-         TypeLicense: {
+         typeLicense: {
             type: String,
          },
          carType: {

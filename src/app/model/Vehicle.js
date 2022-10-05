@@ -1,25 +1,21 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const vehicleSchema = new mongoose.Schema({
    name: {
       type: String,
-      required: [true, 'Please Enter Name'],
+      required: [true, "Please Enter Name"],
    },
    description: {
       type: String,
-      required: [true, 'Please Enter Description'],
+      required: [true, "Please Enter Description"],
    },
    price: {
       type: Number,
-      required: [true, 'Please Enter Price'],
-      maxLength: [8, 'Price can not exceed 8 characters'],
+      required: [true, "Please Enter Price"],
+      maxLength: [8, "Price can not exceed 8 characters"],
    },
    overtimeFee: {
       type: Number,
-   },
-   ratings: {
-      type: Number,
-      default: 0,
    },
    images: [
       {
@@ -35,15 +31,28 @@ const vehicleSchema = new mongoose.Schema({
    ],
    category: {
       type: String,
-      required: [true, 'Please Enter Category'],
+      enum: ["SCOOTER", "CAR"],
+      required: [true, "Please Enter Category"],
    },
    brand: {
       type: String,
-      required: [true, 'Please Enter Brand '],
+      required: [true, "Please Enter Brand "],
    },
    color: {
       type: String,
-      required: [true, 'Please Enter Color '],
+      required: [true, "Please Enter Color "],
+   },
+   seats: {
+      type: Number,
+   },
+   quantity: {
+      type: Number,
+      default: 1,
+      maxLength: [4, "Quantity can not exceed 4 characters"],
+   },
+   ratings: {
+      type: Number,
+      default: 0,
    },
    response: {
       type: Number,
@@ -53,14 +62,6 @@ const vehicleSchema = new mongoose.Schema({
       type: Number,
       default: 0,
    },
-   seats: {
-      type: Number,
-   },
-   quantity: {
-      type: Number,
-      default: 1,
-      maxLength: [4, 'Quantity can not exceed 4 characters'],
-   },
    numOfReviews: {
       type: Number,
       default: 0,
@@ -69,7 +70,7 @@ const vehicleSchema = new mongoose.Schema({
       {
          userId: {
             type: mongoose.Schema.ObjectId,
-            ref: 'users',
+            ref: "users",
             required: true,
          },
          name: {
@@ -88,7 +89,7 @@ const vehicleSchema = new mongoose.Schema({
    ],
    facility: {
       type: mongoose.Schema.ObjectId,
-      ref: 'facilities',
+      ref: "facilities",
       required: true,
    },
    createdAt: {
@@ -97,4 +98,4 @@ const vehicleSchema = new mongoose.Schema({
    },
 });
 
-module.exports = mongoose.model('vehicles', vehicleSchema);
+module.exports = mongoose.model("vehicles", vehicleSchema);

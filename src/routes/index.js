@@ -1,11 +1,15 @@
-// const siteProduct = require('./product');
+const siteVehicle = require("./vehicle");
 const siteAuth = require("./auth");
+const siteUser = require("./user");
+const siteFacility = require("./facility");
 // const siteOrder = require('./order');
 
 function route(app) {
    //    app.use('/product', siteProduct);
    app.use("/auth", siteAuth);
-   //    app.use('/order', siteOrder);
+   app.use("/user", siteUser);
+   app.use("/vehicle", siteVehicle);
+   app.use("/facility", siteFacility);
 
    // app.get('/searchs', (req, res) => {
    //     res.render('searchs')

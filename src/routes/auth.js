@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-// const {
-//    isAuthenticatedUser,
-//    authorizeRole,
-// } = require('../app/middlewares/auth');
+const {
+   isAuthenticatedUser,
+   authorizeRole,
+} = require("../app/middlewares/auth");
 const { isTokenResetValid } = require("../app/middlewares/confirmReset");
 
 const UserController = require("../app/controllers/UserController");
@@ -13,13 +13,7 @@ router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 
 router.get("/logout", UserController.logout);
-router.post("/password/forget", UserController.forgetPassword);
-router.get("/password/reset/:token", isTokenResetValid);
-router.put(
-   "/password/reset/:token",
-   isTokenResetValid,
-   UserController.resetPassword,
-);
+
 router.get(
    "/google",
    passport.authenticate("google", { scope: ["profile", "email"] }),
@@ -28,19 +22,6 @@ router.get(
 router.get(
    "/google/callback",
    passport.authenticate("google", {
-      successRedirect: "/auth/login/success",
-      failureRedirect: "/auth/login/failed",
-   }),
-);
-
-router.get(
-   "/facebook",
-   passport.authenticate("facebook", { scope: ["profile"] }),
-);
-
-router.get(
-   "/facebook/callback",
-   passport.authenticate("facebook", {
       successRedirect: "/auth/login/success",
       failureRedirect: "/auth/login/failed",
    }),
@@ -65,23 +46,7 @@ router.get("/login/fail", (req, res) => {
       message: "login fail",
    });
 });
-// router.put(
-//    '/password/update',
-//    isAuthenticatedUser,
-//    UserController.updatePassword,
-// );
-// router.get('/details', isAuthenticatedUser, UserController.getUserDetails);
-// router.put(
-//    '/details/update',
-//    isAuthenticatedUser,
-//    UserController.updateProfile,
-// );
-// router.get(
-//    '/admin/users',
-//    isAuthenticatedUser,
-//    authorizeRole('admin'),
-//    UserController.getAllUser,
-// );
+
 // router.get(
 //    '/admin/user/:id',
 //    isAuthenticatedUser,
