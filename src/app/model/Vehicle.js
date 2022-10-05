@@ -68,7 +68,7 @@ const vehicleSchema = new mongoose.Schema({
    },
    reviews: [
       {
-         userId: {
+         user: {
             type: mongoose.Schema.ObjectId,
             ref: "users",
             required: true,

@@ -54,7 +54,7 @@ const UserSchema = new mongoose.Schema({
    ],
    reviews: [
       {
-         idUser: {
+         user: {
             type: mongoose.Schema.ObjectId,
             ref: "users",
             required: true,

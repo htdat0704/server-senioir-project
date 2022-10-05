@@ -1,6 +1,7 @@
-const ErrorHander = require("../../utils/errorhandler");
 const jwt = require("jsonwebtoken");
-const User = require("../model/User");
+
+const ErrorHander = require("../../utils/errorhandler");
+const UserService = require("../services/userService");
 
 exports.isAuthenticatedUser = async (req, res, next) => {
    const authHeader = req.header("Authorization");
@@ -13,7 +14,7 @@ exports.isAuthenticatedUser = async (req, res, next) => {
    try {
       const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-      req.user = await User.findById(decoded.userId).lean();
+      req.user = await UserService.findById(decoded.userId).lean();
 
       next();
    } catch (e) {
