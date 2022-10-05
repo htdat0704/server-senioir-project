@@ -105,6 +105,20 @@ class VehilceController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   getReviewByNameVehilce = async (req, res, next) => {
+      try {
+         const { allReviews, countReviews } =
+            await VehicleService.searchReviewsByNameVehicle(req.query.keyword);
+         res.json({
+            allReviews,
+            countReviews,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
 }
 
 module.exports = new VehilceController();
