@@ -4,7 +4,7 @@ exports.findByEmail = email => {
    return User.findOne({ email });
 };
 
-exports.findById = async id => {
+exports.findById = id => {
    return User.findById(id);
 };
 

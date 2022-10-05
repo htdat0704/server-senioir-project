@@ -17,6 +17,12 @@ router.put(
    VehicleController.updateVehilce,
 );
 
+router.put(
+   "/review",
+   isAuthenticatedUser,
+   VehicleController.createVehicleReview,
+);
+
 router.delete(
    "/delete/:id",
    isAuthenticatedUser,

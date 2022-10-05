@@ -45,3 +45,32 @@ exports.findAllVehicle = async (query, resultPerPage = 0) => {
       VehicleCount,
    };
 };
+
+exports.addVehicleReview = async (vehicleId, review) => {
+   const vehicle = await Vehicle.findById(vehicleId);
+   const { user, rating, comment } = review;
+
+   const isReviewed = vehicle.reviews.find(
+      rev => rev.user.toString() === user.toString(),
+   );
+
+   if (isReviewed) {
+      vehicle.reviews.forEach(rev => {
+         if (rev.user.toString() === user.toString()) {
+            rev.rating = rating;
+            rev.comment = comment;
+         }
+      });
+   } else {
+      vehicle.reviews.push(review);
+      vehicle.numOfReviews = vehicle.reviews.length;
+   }
+
+   let avg = 0;
+   vehicle.reviews.forEach(rev => {
+      avg += rev.rating;
+   });
+
+   vehicle.ratings = (avg / vehicle.reviews.length).toFixed();
+   return await vehicle.save({ validateBeforeSave: false });
+};

@@ -69,6 +69,31 @@ class VehilceController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   createVehicleReview = async (req, res, next) => {
+      try {
+         const { rating, comment, vehicleId } = req.body;
+         const review = {
+            user: req.user._id,
+            name: req.user.name,
+            comment,
+            rating: +rating,
+         };
+
+         const vehicle = await VehicleService.addVehicleReview(
+            vehicleId,
+            review,
+         );
+
+         res.json({
+            success: true,
+            review,
+            vehicle,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
 }
 
 module.exports = new VehilceController();
