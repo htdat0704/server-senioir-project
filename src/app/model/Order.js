@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
    userInfor: {
       userId: {
          type: mongoose.Schema.ObjectId,
-         ref: 'users',
+         ref: "users",
          default: null,
       },
       name: {
@@ -13,16 +13,20 @@ const orderSchema = new mongoose.Schema({
       },
       phoneNumber: {
          type: String,
-         minLength: [9, 'Phone number should have more 9 numbers'],
-         maxLength: [11, 'Phone number cannot exceed 30 numbers'],
+         minLength: [9, "Phone number should have more 9 numbers"],
+         maxLength: [11, "Phone number cannot exceed 30 numbers"],
          required: true,
+      },
+      pickUpLocation: {
+         type: String,
+         default: "At garage",
       },
    },
    orderItems: [
       {
          vehicle: {
             type: mongoose.Schema.ObjectId,
-            ref: 'vehicles',
+            ref: "vehicles",
             required: true,
          },
          name: {
@@ -37,9 +41,9 @@ const orderSchema = new mongoose.Schema({
             type: Number,
             required: true,
          },
-         image: {
-            type: String,
-            required: true,
+         timeOfHire: {
+            type: Number,
+            default: 1,
          },
       },
    ],
@@ -58,26 +62,30 @@ const orderSchema = new mongoose.Schema({
       default: 0,
       required: true,
    },
+   overtimeFee: {
+      type: Number,
+      default: 0,
+   },
    payment: {
       paymentType: {
          type: String,
-         required: true,
+         enum: ["MOMO", "VNPAT", "CASH"],
+         default: "CASH",
       },
       paymentStatus: {
          type: String,
-         required: true,
-         default: 'Unpaid',
+         default: "Unpaid",
       },
    },
    facility: {
       type: mongoose.Schema.ObjectId,
-      ref: 'facilities',
+      ref: "facilities",
       required: true,
    },
    orderStatus: {
       type: String,
       required: true,
-      default: 'Processing',
+      default: "Processing",
    },
    createdAt: {
       type: Date,
@@ -85,4 +93,4 @@ const orderSchema = new mongoose.Schema({
    },
 });
 
-module.exports = mongoose.model('orders', orderSchema);
+module.exports = mongoose.model("orders", orderSchema);
