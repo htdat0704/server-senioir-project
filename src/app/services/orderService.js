@@ -13,7 +13,19 @@ exports.findAll = () => {
    return Order.find().lean();
 };
 
-exports.updateOrder = (order, type) => {
+exports.updateOrder = (orderId, bodyUpdate) => {
+   return Order.findByIdAndUpdate(orderId, bodyUpdate, { new: true });
+};
+
+exports.deleteOrder = async orderId => {
+   const order = await Order.findById(orderId);
+   if (!order) {
+      throw new Error("Order not exits");
+   }
+   return order.delete();
+};
+
+exports.updateOrderPayment = (order, type) => {
    return Order.findByIdAndUpdate(
       order._id,
       {

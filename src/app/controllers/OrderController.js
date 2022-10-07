@@ -1,5 +1,7 @@
 const https = require("https");
 const crypto = require("crypto");
+const dateFormat = require("dateformat");
+const argon2 = require("argon2");
 
 const OrderService = require("../services/orderService");
 const ErrorHander = require("../../utils/errorhandler");
@@ -17,10 +19,29 @@ class OrderController {
       }
    };
 
+   deleteOrder = async (req, res, next) => {
+      try {
+         await OrderService.deleteOrder(req.params.id);
+         res.json({
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   updateOrder = async (req, res, next) => {
+      try {
+         const order = await OrderService.updateOrder(req.params.id, req.body);
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    createOrder = async (req, res, next) => {
       try {
          let order = await OrderService.createOrder(req.body);
-         order = await OrderService.updateOrder(order);
+
          res.json({
             order,
             success: true,
@@ -36,7 +57,7 @@ class OrderController {
       try {
          const { extraData } = req.query;
          let order = await OrderService.findById(extraData.toString());
-         order = await OrderService.updateOrder(order, "MoMo");
+         order = await OrderService.updateOrderPayment(order, "MoMo");
 
          res.json({
             order,
@@ -147,6 +168,138 @@ class OrderController {
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
+   };
+
+   sendVNPayReturn = async (req, res, next) => {
+      function sortObject(obj) {
+         var sorted = {};
+         var str = [];
+         var key;
+         for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+               str.push(encodeURIComponent(key));
+            }
+         }
+         str.sort();
+         for (key = 0; key < str.length; key++) {
+            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
+               /%20/g,
+               "+",
+            );
+         }
+         return sorted;
+      }
+
+      var vnp_Params = req.query;
+
+      var secureHash = vnp_Params["vnp_SecureHash"];
+
+      delete vnp_Params["vnp_SecureHash"];
+      delete vnp_Params["vnp_SecureHashType"];
+
+      vnp_Params = sortObject(vnp_Params);
+
+      var tmnCode = process.env.VNP_TMNCODE;
+      var secretKey = process.env.VNP_HASHSECRET;
+
+      var querystring = require("qs");
+      var signData = querystring.stringify(vnp_Params, { encode: false });
+      var crypto = require("crypto");
+      var hmac = crypto.createHmac("sha512", secretKey);
+      var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+
+      if (secureHash === signed) {
+         //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+         const orderId = req.query.split(",")[1];
+         const order = await OrderService.updateOrderPayment(orderId, "VNPAY");
+         // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
+         res.json({
+            success: "success",
+            code: { code: vnp_Params["vnp_ResponseCode"] },
+            data: req.query,
+            order,
+         });
+      } else {
+         res.render("success", { code: "97" });
+      }
+   };
+
+   sendVNPay = (req, res, next) => {
+      var ipAddr =
+         req.headers["x-forwarded-for"] ||
+         req.connection.remoteAddress ||
+         req.socket.remoteAddress ||
+         req.connection.socket.remoteAddress;
+
+      var tmnCode = process.env.VNP_TMNCODE;
+      var secretKey = process.env.VNP_HASHSECRET;
+      var vnpUrl = process.env.VNP_URL;
+      var returnUrl = process.env.VNP_ReturnUrl;
+
+      var date = new Date();
+
+      var createDate = dateFormat(date, "yyyymmddHHmmss");
+      var orderId = dateFormat(date, "HHmmss");
+      var amount = req.body.amount;
+      var bankCode = "";
+
+      var orderInfo = req.body.name;
+      var orderType = "billpayment";
+      var locale = "vn";
+      if (locale === null || locale === "") {
+         locale = "vn";
+      }
+      var currCode = "VND";
+      var vnp_Params = {};
+
+      vnp_Params["vnp_Version"] = "2.1.0";
+      vnp_Params["vnp_Command"] = "pay";
+      vnp_Params["vnp_TmnCode"] = tmnCode;
+      // vnp_Params["vnp_Merchant"] = req.body.orderId;
+      vnp_Params["vnp_Locale"] = locale;
+      vnp_Params["vnp_CurrCode"] = currCode;
+      vnp_Params["vnp_TxnRef"] = orderId;
+      vnp_Params["vnp_OrderInfo"] = orderInfo + "," + req.body.orderId;
+      vnp_Params["vnp_OrderType"] = orderType;
+      vnp_Params["vnp_Amount"] = amount * 100;
+      vnp_Params["vnp_ReturnUrl"] = returnUrl;
+      vnp_Params["vnp_IpAddr"] = ipAddr;
+      vnp_Params["vnp_CreateDate"] = createDate;
+      // vnp_Params["vnp_idOrder"] = req.body.orderId;
+      if (bankCode !== null && bankCode !== "") {
+         vnp_Params["vnp_BankCode"] = bankCode;
+      }
+
+      function sortObject(obj) {
+         var sorted = {};
+         var str = [];
+         var key;
+         for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+               str.push(encodeURIComponent(key));
+            }
+         }
+         str.sort();
+         for (key = 0; key < str.length; key++) {
+            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
+               /%20/g,
+               "+",
+            );
+         }
+         return sorted;
+      }
+
+      vnp_Params = sortObject(vnp_Params);
+
+      var querystring = require("qs");
+      var signData = querystring.stringify(vnp_Params, { encode: false });
+      var crypto = require("crypto");
+      var hmac = crypto.createHmac("sha512", secretKey);
+      var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+      vnp_Params["vnp_SecureHash"] = signed;
+      vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
+      console.log(vnpUrl);
+      res.redirect(vnpUrl);
    };
 }
 
