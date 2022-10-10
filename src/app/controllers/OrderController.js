@@ -5,6 +5,7 @@ const argon2 = require("argon2");
 
 const OrderService = require("../services/orderService");
 const ErrorHander = require("../../utils/errorhandler");
+const sortObject = require("../../utils/sortObject");
 
 class OrderController {
    getAllOrders = async (req, res, next) => {
@@ -33,6 +34,10 @@ class OrderController {
    updateOrder = async (req, res, next) => {
       try {
          const order = await OrderService.updateOrder(req.params.id, req.body);
+         res.json({
+            success: true,
+            order,
+         });
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
@@ -51,13 +56,13 @@ class OrderController {
       }
    };
 
-   updateStatusOrder = async (req, res, next) => {};
-
    momoSuccess = async (req, res, next) => {
       try {
          const { extraData } = req.query;
-         let order = await OrderService.findById(extraData.toString());
-         order = await OrderService.updateOrderPayment(order, "MoMo");
+         order = await OrderService.updateOrderPayment(
+            extraData.toString(),
+            "MoMo",
+         );
 
          res.json({
             order,
@@ -74,8 +79,8 @@ class OrderController {
          return next(new ErrorHander("Order has been paid", 403));
       }
       var partnerCode = "MOMO";
-      var accessKey = "F8BBA842ECF85";
-      var secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+      var accessKey = process.env.MOMO_ACCESSKEY;
+      var secretkey = process.env.MOMO_SECRETKEY;
       var requestId = partnerCode + new Date().getTime();
       var orderId = requestId;
       var orderInfo = req.body.name;
@@ -145,7 +150,6 @@ class OrderController {
             console.log(`Headers: ${JSON.stringify(response.headers)}`);
             response.setEncoding("utf8");
             response.on("data", body => {
-               console.log(1);
                req.bodyToMomo += body;
             });
             response.on("end", () => {
@@ -171,24 +175,24 @@ class OrderController {
    };
 
    sendVNPayReturn = async (req, res, next) => {
-      function sortObject(obj) {
-         var sorted = {};
-         var str = [];
-         var key;
-         for (key in obj) {
-            if (obj.hasOwnProperty(key)) {
-               str.push(encodeURIComponent(key));
-            }
-         }
-         str.sort();
-         for (key = 0; key < str.length; key++) {
-            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
-               /%20/g,
-               "+",
-            );
-         }
-         return sorted;
-      }
+      // function sortObject(obj) {
+      //    var sorted = {};
+      //    var str = [];
+      //    var key;
+      //    for (key in obj) {
+      //       if (obj.hasOwnProperty(key)) {
+      //          str.push(encodeURIComponent(key));
+      //       }
+      //    }
+      //    str.sort();
+      //    for (key = 0; key < str.length; key++) {
+      //       sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
+      //          /%20/g,
+      //          "+",
+      //       );
+      //    }
+      //    return sorted;
+      // }
 
       var vnp_Params = req.query;
 
@@ -210,7 +214,7 @@ class OrderController {
 
       if (secureHash === signed) {
          //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-         const orderId = req.query.split(",")[1];
+         const orderId = req.query.vnp_OrderInfo.split(",")[1];
          const order = await OrderService.updateOrderPayment(orderId, "VNPAY");
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
          res.json({
@@ -270,24 +274,24 @@ class OrderController {
          vnp_Params["vnp_BankCode"] = bankCode;
       }
 
-      function sortObject(obj) {
-         var sorted = {};
-         var str = [];
-         var key;
-         for (key in obj) {
-            if (obj.hasOwnProperty(key)) {
-               str.push(encodeURIComponent(key));
-            }
-         }
-         str.sort();
-         for (key = 0; key < str.length; key++) {
-            sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
-               /%20/g,
-               "+",
-            );
-         }
-         return sorted;
-      }
+      // function sortObject(obj) {
+      //    var sorted = {};
+      //    var str = [];
+      //    var key;
+      //    for (key in obj) {
+      //       if (obj.hasOwnProperty(key)) {
+      //          str.push(encodeURIComponent(key));
+      //       }
+      //    }
+      //    str.sort();
+      //    for (key = 0; key < str.length; key++) {
+      //       sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
+      //          /%20/g,
+      //          "+",
+      //       );
+      //    }
+      //    return sorted;
+      // }
 
       vnp_Params = sortObject(vnp_Params);
 

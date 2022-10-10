@@ -25,9 +25,9 @@ exports.deleteOrder = async orderId => {
    return order.delete();
 };
 
-exports.updateOrderPayment = (order, type) => {
+exports.updateOrderPayment = (orderId, type) => {
    return Order.findByIdAndUpdate(
-      order._id,
+      orderId,
       {
          payment: {
             paymentType: type,
