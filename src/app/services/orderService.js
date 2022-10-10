@@ -1,3 +1,5 @@
+const https = require("https");
+
 const Order = require("../model/Order");
 
 exports.createOrder = bodyCreate => {
@@ -36,4 +38,28 @@ exports.updateOrderPayment = (orderId, type) => {
       },
       { new: true },
    );
+};
+
+exports.requestToMoMo = (options, requestBody, res) => {
+   let bodyRequest = "";
+   const request = https.request(options, response => {
+      console.log(`Status: ${response.statusCode}`);
+      console.log(`Headers: ${JSON.stringify(response.headers)}`);
+      response.setEncoding("utf8");
+      response.on("data", body => {
+         bodyRequest += body;
+      });
+      response.on("end", () => {
+         console.log("No more data in response.");
+         console.log(bodyRequest);
+         res.redirect(JSON.parse(bodyRequest).payUrl);
+      });
+   });
+   request.on("error", e => {
+      console.log(`problem with request: ${e.message}`);
+   });
+   // write data to request body
+   console.log("Sending....");
+   request.write(requestBody);
+   request.end();
 };

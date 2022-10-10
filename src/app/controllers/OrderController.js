@@ -1,4 +1,3 @@
-const https = require("https");
 const crypto = require("crypto");
 const dateFormat = require("dateformat");
 const argon2 = require("argon2");
@@ -59,7 +58,7 @@ class OrderController {
    momoSuccess = async (req, res, next) => {
       try {
          const { extraData } = req.query;
-         order = await OrderService.updateOrderPayment(
+         const order = await OrderService.updateOrderPayment(
             extraData.toString(),
             "MoMo",
          );
@@ -143,32 +142,32 @@ class OrderController {
             "Content-Length": Buffer.byteLength(requestBody),
          },
       };
-      req.bodyToMomo = "";
       try {
-         const request = https.request(options, response => {
-            console.log(`Status: ${response.statusCode}`);
-            console.log(`Headers: ${JSON.stringify(response.headers)}`);
-            response.setEncoding("utf8");
-            response.on("data", body => {
-               req.bodyToMomo += body;
-            });
-            response.on("end", () => {
-               console.log("No more data in response.");
-               console.log(JSON.parse(req.bodyToMomo));
-               if (req.bodyToMomo) {
-                  console.log(JSON.parse(req.bodyToMomo));
-                  typeof req.bodyToMomo != "object" &&
-                     res.redirect(JSON.parse(req.bodyToMomo).payUrl);
-               }
-            });
-         });
-         request.on("error", e => {
-            console.log(`problem with request: ${e.message}`);
-         });
-         // write data to request body
-         console.log("Sending....");
-         request.write(requestBody);
-         request.end();
+         // const request = https.request(options, response => {
+         //    console.log(`Status: ${response.statusCode}`);
+         //    console.log(`Headers: ${JSON.stringify(response.headers)}`);
+         //    response.setEncoding("utf8");
+         //    response.on("data", body => {
+         //       req.bodyToMomo += body;
+         //    });
+         //    response.on("end", () => {
+         //       console.log("No more data in response.");
+         //       console.log(JSON.parse(req.bodyToMomo));
+         //       if (req.bodyToMomo) {
+         //          console.log(JSON.parse(req.bodyToMomo));
+         //          typeof req.bodyToMomo != "object" &&
+         //             res.redirect(JSON.parse(req.bodyToMomo).payUrl);
+         //       }
+         //    });
+         // });
+         // request.on("error", e => {
+         //    console.log(`problem with request: ${e.message}`);
+         // });
+         // // write data to request body
+         // console.log("Sending....");
+         // request.write(requestBody);
+         // request.end();
+         await OrderService.requestToMoMo(options, requestBody, res);
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
