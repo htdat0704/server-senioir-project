@@ -16,7 +16,7 @@ class UserController {
          const userFound = await UserService.foundUserWithPassowrd(email);
 
          if (!userFound) {
-            return next(new ErrorHander("User not found", 402));
+            return next(new ErrorHander("Username or Password invalid", 400));
          }
 
          const passwordValid = await argon2.verify(
@@ -25,7 +25,7 @@ class UserController {
          );
 
          if (!passwordValid) {
-            return next(new ErrorHander("Password not Right", 402));
+            return next(new ErrorHander("Username or Password invalid", 400));
          }
 
          const accessToken = jwt.sign(
@@ -84,7 +84,6 @@ class UserController {
 
          const random = Math.floor(Math.random() * 100000000000000000);
          const requestPasswordUrl = `${process.env.URL_WEBSITE}/user/password/reset/${random}`;
-
          const message = `Your password reset token is :- \n\n ${requestPasswordUrl} \n\n If you have not requested this email then, please ignore it`;
 
          userFound = await UserService.resetPasswordToken(email, random);

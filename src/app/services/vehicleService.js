@@ -20,7 +20,10 @@ exports.deleteVehicle = vehilce => {
 
 exports.findAllVehicle = async (query, resultPerPage = 0) => {
    const VehicleCount = await Vehicle.countDocuments();
-   const apiFeaturesFilter = new ApiFeatures(Vehicle.find(), query)
+   const apiFeaturesFilter = new ApiFeatures(
+      Vehicle.find().populate("facility", "name location"),
+      query,
+   )
       .searchByName()
       .filter();
 
@@ -29,7 +32,7 @@ exports.findAllVehicle = async (query, resultPerPage = 0) => {
 
    if (resultPerPage) {
       const apiFeaturesFilterPaginagtion = new ApiFeatures(
-         Vehicle.find(),
+         Vehicle.find().populate("facility", "name location"),
          query,
       )
          .searchByName()
