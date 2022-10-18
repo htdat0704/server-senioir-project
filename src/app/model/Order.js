@@ -17,6 +17,10 @@ const orderSchema = new mongoose.Schema({
          maxLength: [11, "Phone number cannot exceed 30 numbers"],
          required: true,
       },
+      pickUpLocation: {
+         type: String,
+         default: "At garage",
+      },
    },
    orderItems: [
       {
@@ -37,9 +41,9 @@ const orderSchema = new mongoose.Schema({
             type: Number,
             required: true,
          },
-         image: {
-            type: String,
-            required: true,
+         timeOfHire: {
+            type: Number,
+            default: 1,
          },
          fromDate: {
             type: Date,
@@ -66,14 +70,22 @@ const orderSchema = new mongoose.Schema({
       default: 0,
       required: true,
    },
+   overtimeFee: {
+      type: Number,
+      default: 0,
+   },
    payment: {
       paymentType: {
          type: String,
-         required: true,
+         enum: ["MOMO", "VNPAY", "CASH"],
+         default: "CASH",
       },
       paymentStatus: {
          type: String,
+<<<<<<< HEAD
          required: true,
+=======
+>>>>>>> 023c8dd435fd28eb826b855ec6eb7862f97f1f6c
          default: "Unpaid",
       },
    },
