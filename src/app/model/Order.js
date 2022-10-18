@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
    userInfor: {
       userId: {
          type: mongoose.Schema.ObjectId,
-         ref: 'users',
+         ref: "users",
          default: null,
       },
       name: {
@@ -13,8 +13,8 @@ const orderSchema = new mongoose.Schema({
       },
       phoneNumber: {
          type: String,
-         minLength: [9, 'Phone number should have more 9 numbers'],
-         maxLength: [11, 'Phone number cannot exceed 30 numbers'],
+         minLength: [9, "Phone number should have more 9 numbers"],
+         maxLength: [11, "Phone number cannot exceed 30 numbers"],
          required: true,
       },
    },
@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema({
       {
          vehicle: {
             type: mongoose.Schema.ObjectId,
-            ref: 'vehicles',
+            ref: "vehicles",
             required: true,
          },
          name: {
@@ -40,6 +40,14 @@ const orderSchema = new mongoose.Schema({
          image: {
             type: String,
             required: true,
+         },
+         fromDate: {
+            type: Date,
+            require: true,
+         },
+         endDate: {
+            type: Date,
+            require: true,
          },
       },
    ],
@@ -66,18 +74,18 @@ const orderSchema = new mongoose.Schema({
       paymentStatus: {
          type: String,
          required: true,
-         default: 'Unpaid',
+         default: "Unpaid",
       },
    },
    facility: {
       type: mongoose.Schema.ObjectId,
-      ref: 'facilities',
+      ref: "facilities",
       required: true,
    },
    orderStatus: {
       type: String,
       required: true,
-      default: 'Processing',
+      default: "Processing",
    },
    createdAt: {
       type: Date,
@@ -85,4 +93,4 @@ const orderSchema = new mongoose.Schema({
    },
 });
 
-module.exports = mongoose.model('orders', orderSchema);
+module.exports = mongoose.model("orders", orderSchema);
