@@ -24,6 +24,21 @@ class VehilceController {
       }
    };
 
+   getSingleVehicle = async (req, res, next) => {
+      try {
+         const vehicle = await VehicleService.findById(req.params.id);
+         if (!vehicle) {
+            return next(new ErrorHander("vehicle not found", 400));
+         }
+         res.json({
+            vehicle,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    createVehicle = async (req, res, next) => {
       try {
          const vehicle = await VehicleService.createNewVehicle(req.body);

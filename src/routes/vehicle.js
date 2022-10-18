@@ -12,6 +12,8 @@ router.get("/list", VehicleController.findAllVehicle);
 
 router.get("/reviews", VehicleController.getAllReviews);
 
+router.get("/:id", VehicleController.getSingleVehicle);
+
 router.put(
    "/review",
    isAuthenticatedUser,
