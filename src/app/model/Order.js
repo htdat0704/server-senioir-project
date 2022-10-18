@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
+const dateVietNam = moment.tz(Date.now(), "Asia/Riyadh");
 
 const orderSchema = new mongoose.Schema({
    userInfor: {
@@ -21,6 +23,14 @@ const orderSchema = new mongoose.Schema({
          type: String,
          default: "At garage",
       },
+   },
+   fromDate: {
+      type: Date,
+      require: true,
+   },
+   endDate: {
+      type: Date,
+      require: true,
    },
    orderItems: [
       {
@@ -99,9 +109,13 @@ const orderSchema = new mongoose.Schema({
       required: true,
       default: "Processing",
    },
+   updatedAt: {
+      type: Date,
+      default: dateVietNam,
+   },
    createdAt: {
       type: Date,
-      default: Date.now,
+      default: dateVietNam,
    },
 });
 
