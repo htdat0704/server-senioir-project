@@ -74,3 +74,43 @@ exports.addVehicleReview = async (vehicleId, review) => {
    vehicle.ratings = (avg / vehicle.reviews.length).toFixed();
    return await vehicle.save({ validateBeforeSave: false });
 };
+
+exports.findAllVehicleReview = async (resultPerPage = 0) => {
+   const vehicles = await Vehicle.find().lean();
+
+   let AllReviews = [];
+
+   vehicles.map(vehicle => {
+      vehicle.reviews &&
+         vehicle.reviews.map(rv => {
+            rv.vehicleName = vehicle.name;
+            rv.vehicleId = vehicle._id;
+            AllReviews.push(rv);
+         });
+   });
+   return AllReviews;
+};
+
+exports.searchReviewsByNameVehicle = async keyword => {
+   const vehicle = await Vehicle.find({
+      name: {
+         $regex: keyword,
+         $options: "i",
+      },
+   });
+
+   let allReviews = [];
+
+   vehicle.map(vehicle => {
+      vehicle.reviews &&
+         vehicle.reviews.map(rv => {
+            rv.vehicleName = vehicle.name;
+            rv.vehicleId = vehicle._id;
+            allReviews.push(rv);
+         });
+   });
+
+   return { allReviews, countReviews: allReviews.length };
+};
+
+exports.deleteReview = async keyword => {};
