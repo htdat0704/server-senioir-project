@@ -10,7 +10,7 @@ const OrderController = require("../app/controllers/OrderController");
 
 router.get("/list", OrderController.getAllOrders);
 
-router.post("/create", OrderController.createOrder);
+router.post("/create", isAuthenticatedUser, OrderController.createOrder);
 
 router.put(
    "/update/:id",

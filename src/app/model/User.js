@@ -45,6 +45,10 @@ const UserSchema = new mongoose.Schema({
    country: {
       type: String,
    },
+   numberOfRental: {
+      type: Number,
+      default: 0,
+   },
    driverLicense: [
       {
          typeLicense: {

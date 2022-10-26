@@ -1,7 +1,3 @@
-const argon2 = require("argon2");
-const jwt = require("jsonwebtoken");
-const cloundinary = require("cloudinary");
-
 const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
 
@@ -72,11 +68,7 @@ class VehilceController {
 
    deleteVehicle = async (req, res, next) => {
       try {
-         const vehicleFound = await VehicleService.findById(req.params.id);
-         if (!vehicleFound) {
-            return next(new ErrorHander("vehicle not found", 400));
-         }
-         await VehicleService.deleteVehicle(vehicleFound);
+         await VehicleService.deleteVehicle(req.params.id);
          res.json({
             success: true,
          });

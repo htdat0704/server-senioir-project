@@ -101,3 +101,14 @@ exports.deleteUser = user => {
 exports.findAllUser = () => {
    return User.find();
 };
+
+exports.updateNumberOfRental = async idUser => {
+   const user = await User.findById(idUser);
+   let numberOfRental = 0;
+   if (!user.numberOfRental) {
+      numberOfRental = 1;
+   } else {
+      numberOfRental = +user.numberOfRental + 1;
+   }
+   return User.findByIdAndUpdate(idUser, { numberOfRental }, { new: true });
+};

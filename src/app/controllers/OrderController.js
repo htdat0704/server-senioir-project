@@ -3,6 +3,8 @@ const dateFormat = require("dateformat");
 const argon2 = require("argon2");
 
 const OrderService = require("../services/orderService");
+const UserService = require("../services/userService");
+const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
 const sortObject = require("../../utils/sortObject");
 
@@ -33,6 +35,12 @@ class OrderController {
    updateOrder = async (req, res, next) => {
       try {
          const order = await OrderService.updateOrder(req.params.id, req.body);
+         if (req.body.orderStatus === "Success") {
+            await UserService.updateNumberOfRental(order.userInfor.userId);
+            for (let obj of order.orderItems) {
+               await VehicleService.updateNumberOfRental(obj.vehicle._id);
+            }
+         }
          res.json({
             success: true,
             order,
@@ -44,6 +52,8 @@ class OrderController {
 
    createOrder = async (req, res, next) => {
       try {
+         req.body.user = req.user._id;
+
          let order = await OrderService.createOrder(req.body);
 
          res.json({
@@ -174,25 +184,6 @@ class OrderController {
    };
 
    sendVNPayReturn = async (req, res, next) => {
-      // function sortObject(obj) {
-      //    var sorted = {};
-      //    var str = [];
-      //    var key;
-      //    for (key in obj) {
-      //       if (obj.hasOwnProperty(key)) {
-      //          str.push(encodeURIComponent(key));
-      //       }
-      //    }
-      //    str.sort();
-      //    for (key = 0; key < str.length; key++) {
-      //       sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
-      //          /%20/g,
-      //          "+",
-      //       );
-      //    }
-      //    return sorted;
-      // }
-
       var vnp_Params = req.query;
 
       var secureHash = vnp_Params["vnp_SecureHash"];
@@ -272,25 +263,6 @@ class OrderController {
       if (bankCode !== null && bankCode !== "") {
          vnp_Params["vnp_BankCode"] = bankCode;
       }
-
-      // function sortObject(obj) {
-      //    var sorted = {};
-      //    var str = [];
-      //    var key;
-      //    for (key in obj) {
-      //       if (obj.hasOwnProperty(key)) {
-      //          str.push(encodeURIComponent(key));
-      //       }
-      //    }
-      //    str.sort();
-      //    for (key = 0; key < str.length; key++) {
-      //       sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
-      //          /%20/g,
-      //          "+",
-      //       );
-      //    }
-      //    return sorted;
-      // }
 
       vnp_Params = sortObject(vnp_Params);
 

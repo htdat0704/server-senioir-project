@@ -8,15 +8,22 @@ exports.createOrder = bodyCreate => {
 };
 
 exports.findById = orderId => {
-   return Order.findById(orderId);
+   return Order.findById(orderId)
+      .populate("orderItems.vehicle", "name price")
+      .populate("user", "name phoneNumber");
 };
 
 exports.findAll = () => {
-   return Order.find().lean();
+   return Order.find()
+      .populate("orderItems.vehicle", "name price")
+      .populate("user", "name phoneNumber")
+      .lean();
 };
 
 exports.updateOrder = (orderId, bodyUpdate) => {
-   return Order.findByIdAndUpdate(orderId, bodyUpdate, { new: true });
+   return Order.findByIdAndUpdate(orderId, bodyUpdate, { new: true })
+      .populate("orderItems.vehicle", "name price")
+      .populate("user", "name phoneNumber");
 };
 
 exports.deleteOrder = async orderId => {
@@ -37,7 +44,9 @@ exports.updateOrderPayment = (orderId, type) => {
          },
       },
       { new: true },
-   );
+   )
+      .populate("orderItems.vehicle", "name price")
+      .populate("user", "name phoneNumber");
 };
 
 exports.requestToMoMo = (options, requestBody, res) => {

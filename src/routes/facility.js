@@ -10,6 +10,8 @@ const FacilityController = require("../app/controllers/FacilityController");
 
 router.get("/list", FacilityController.getAllFacility);
 
+router.get("/:idFacility", FacilityController.getDetailFacility);
+
 router.post(
    "/create",
    isAuthenticatedUser,

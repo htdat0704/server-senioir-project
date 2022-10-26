@@ -16,6 +16,19 @@ class FacilityController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   getDetailFacility = async (req, res, next) => {
+      try {
+         const facility = await FacilityService.findById(req.params.idFacility);
+         res.json({
+            facility,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    createFacility = async (req, res, next) => {
       try {
          const facility = await FacilityService.createNewFacility(req.body);

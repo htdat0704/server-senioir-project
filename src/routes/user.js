@@ -35,7 +35,7 @@ router.put(
 );
 
 router.get(
-   "/admin/users",
+   "/admin/list",
    isAuthenticatedUser,
    authorizeRole("admin"),
    UserController.getAllUser,

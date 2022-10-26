@@ -16,6 +16,7 @@ const vehicleSchema = new mongoose.Schema({
    },
    overtimeFee: {
       type: Number,
+      default: 0,
    },
    images: [
       {
@@ -44,6 +45,11 @@ const vehicleSchema = new mongoose.Schema({
    },
    seats: {
       type: Number,
+      required: true,
+   },
+   feature: {
+      type: String,
+      required: true,
    },
    quantity: {
       type: Number,
