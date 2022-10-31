@@ -9,7 +9,7 @@ class VehilceController {
          result = await VehicleService.findAllVehicle(
             req.query,
             req.body.resultPerPage,
-            "-seats -color -description -overtimeFee -response -numberOfRental -numOfReviews -reviews",
+            "-seats -color -description -overtimeFee -response -numberOfRental -numOfReviews -reviews -feature",
          );
 
          res.json({
@@ -28,6 +28,7 @@ class VehilceController {
          result = await VehicleService.findAllVehicle(
             req.query,
             req.body.resultPerPage,
+            "-seats -description -response -numberOfRental -numOfReviews -reviews -feature",
          );
 
          res.json({
