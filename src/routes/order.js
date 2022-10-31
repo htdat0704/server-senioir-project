@@ -17,6 +17,8 @@ router.get(
 
 router.post("/create", isAuthenticatedUser, OrderController.createOrder);
 
+router.get("/myOrders", isAuthenticatedUser, OrderController.myOrders);
+
 router.get("/:id", isAuthenticatedUser, OrderController.getOneOrder);
 
 router.put(

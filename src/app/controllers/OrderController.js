@@ -21,6 +21,21 @@ class OrderController {
       }
    };
 
+   myOrders = async (req, res, next) => {
+      try {
+         const orders = await OrderService.findByUser(req.user._id);
+         const month = new Date(orders[0].fromDate).getMonth();
+         console.log(month);
+         res.json({
+            month,
+            orders,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    deleteOrder = async (req, res, next) => {
       try {
          await OrderService.deleteOrder(req.params.id);

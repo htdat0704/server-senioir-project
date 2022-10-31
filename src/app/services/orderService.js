@@ -14,6 +14,13 @@ exports.findById = orderId => {
       .populate("facility", "name");
 };
 
+exports.findByUser = userId => {
+   return Order.find({ user: userId })
+      .populate("orderItems.vehicle", "name price images overtimeFee")
+      .populate("user", "name phoneNumber")
+      .populate("facility", "name");
+};
+
 exports.findAll = () => {
    return Order.find()
       .populate("orderItems.vehicle", "name price overtimeFee")
