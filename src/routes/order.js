@@ -8,9 +8,16 @@ const {
 
 const OrderController = require("../app/controllers/OrderController");
 
-router.get("/list", OrderController.getAllOrders);
+router.get(
+   "/list",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.getAllOrders,
+);
 
 router.post("/create", isAuthenticatedUser, OrderController.createOrder);
+
+router.get("/:id", isAuthenticatedUser, OrderController.getOneOrder);
 
 router.put(
    "/update/:id",

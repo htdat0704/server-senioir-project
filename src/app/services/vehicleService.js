@@ -16,6 +16,8 @@ exports.createNewVehicle = async bodyCreate => {
       for (let i = 0; i < images.length; i++) {
          const result = await cloudinary.v2.uploader.upload(images[i], {
             folder: "vehicles",
+            width: 550,
+            crop: "scale",
          });
 
          imagesLinks.push({
@@ -63,6 +65,8 @@ exports.updateVehicle = async (idVehicle, bodyUpdate) => {
       for (let i = 0; i < images.length; i++) {
          const result = await cloudinary.v2.uploader.upload(images[i], {
             folder: "vehicles",
+            width: 550,
+            crop: "scale",
          });
 
          imagesLinks.push({
@@ -111,10 +115,10 @@ exports.deleteVehicle = async vehicleId => {
    return vehicle.remove();
 };
 
-exports.findAllVehicle = async (query, resultPerPage = 0) => {
+exports.findAllVehicle = async (query, resultPerPage = 0, selected) => {
    const VehicleCount = await Vehicle.countDocuments();
    const apiFeaturesFilter = new ApiFeatures(
-      Vehicle.find().populate("facility", "name location"),
+      Vehicle.find().populate("facility", "name location").select(selected),
       query,
    )
       .searchByName()
@@ -125,7 +129,7 @@ exports.findAllVehicle = async (query, resultPerPage = 0) => {
 
    if (resultPerPage) {
       const apiFeaturesFilterPaginagtion = new ApiFeatures(
-         Vehicle.find().populate("facility", "name location"),
+         Vehicle.find().populate("facility", "name location").select(selected),
          query,
       )
          .searchByName()
@@ -167,7 +171,7 @@ exports.addVehicleReview = async (vehicleId, review) => {
       avg += rev.rating;
    });
 
-   vehicle.ratings = (avg / vehicle.reviews.length).toFixed();
+   vehicle.ratings = (avg / vehicle.reviews.length).toFixed(1);
    return await vehicle.save({ validateBeforeSave: false });
 };
 
@@ -230,7 +234,7 @@ exports.deleteReview = async (vehicleId, reviewId) => {
    let ratings = 0;
 
    if (numOfReviews) {
-      ratings = (avg / reviews.length).toFixed();
+      ratings = (avg / reviews.length).toFixed(1);
    }
 
    return await Vehicle.findByIdAndUpdate(vehicleId, {

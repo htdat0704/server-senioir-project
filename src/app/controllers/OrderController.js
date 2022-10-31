@@ -34,13 +34,42 @@ class OrderController {
 
    updateOrder = async (req, res, next) => {
       try {
-         const order = await OrderService.updateOrder(req.params.id, req.body);
+         let order = await OrderService.findById(req.params.id);
+
+         if (req.body.overtimeHour) {
+            req.body.overtimeFee =
+               order.orderItems.reduce(
+                  (previousValue, currentValue) =>
+                     (previousValue += currentValue.vehicle.overtimeFee),
+                  0,
+               ) * req.body.overtimeHour;
+            req.body.totalPrice =
+               +order.taxPrice + +order.itemsPrice + req.body.overtimeFee;
+         }
+
          if (req.body.orderStatus === "Success") {
-            await UserService.updateNumberOfRental(order.userInfor.userId);
+            await UserService.updateNumberOfRental(order.user);
             for (let obj of order.orderItems) {
                await VehicleService.updateNumberOfRental(obj.vehicle._id);
             }
          }
+
+         if (req.body.orderStatus === "Going") {
+            req.body.payment = {
+               paymentType: order.payment.paymentType,
+               paymentStatus: "Paid",
+            };
+         }
+
+         if (req.body.paymentType !== order.payment.paymentType) {
+            req.body.payment = {
+               ...order.payment,
+               paymentType: req.body.paymentType,
+            };
+         }
+
+         order = await OrderService.updateOrder(req.params.id, req.body);
+
          res.json({
             success: true,
             order,
@@ -55,6 +84,19 @@ class OrderController {
          req.body.user = req.user._id;
 
          let order = await OrderService.createOrder(req.body);
+
+         res.json({
+            order,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   getOneOrder = async (req, res, next) => {
+      try {
+         let order = await OrderService.findById(req.params.id);
 
          res.json({
             order,

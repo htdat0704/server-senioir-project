@@ -41,12 +41,7 @@ router.get(
    UserController.getAllUser,
 );
 
-router.get(
-   "/admin/user/:id",
-   isAuthenticatedUser,
-   authorizeRole("admin"),
-   UserController.getSingleUser,
-);
+router.get("/admin/user/:id", UserController.getSingleUser);
 
 router.delete(
    "/admin/delete/:id",

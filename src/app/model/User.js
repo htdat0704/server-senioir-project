@@ -49,16 +49,7 @@ const UserSchema = new mongoose.Schema({
       type: Number,
       default: 0,
    },
-   driverLicense: [
-      {
-         typeLicense: {
-            type: String,
-         },
-         carType: {
-            type: String,
-         },
-      },
-   ],
+   driverLicense: { type: String },
    reviews: [
       {
          user: {

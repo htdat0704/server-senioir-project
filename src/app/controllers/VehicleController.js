@@ -9,6 +9,25 @@ class VehilceController {
          result = await VehicleService.findAllVehicle(
             req.query,
             req.body.resultPerPage,
+            "-seats -color -description -overtimeFee -response -numberOfRental -numOfReviews -reviews",
+         );
+
+         res.json({
+            ...result,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   findAllVehicleByAdmin = async (req, res, next) => {
+      try {
+         let result = { vehicles: "", filterCountProducts: 0, VehicleCount: 0 };
+
+         result = await VehicleService.findAllVehicle(
+            req.query,
+            req.body.resultPerPage,
          );
 
          res.json({

@@ -9,21 +9,24 @@ exports.createOrder = bodyCreate => {
 
 exports.findById = orderId => {
    return Order.findById(orderId)
-      .populate("orderItems.vehicle", "name price")
-      .populate("user", "name phoneNumber");
+      .populate("orderItems.vehicle", "name price images overtimeFee")
+      .populate("user", "name phoneNumber")
+      .populate("facility", "name");
 };
 
 exports.findAll = () => {
    return Order.find()
-      .populate("orderItems.vehicle", "name price")
+      .populate("orderItems.vehicle", "name price overtimeFee")
       .populate("user", "name phoneNumber")
+      .populate("facility", "name")
       .lean();
 };
 
 exports.updateOrder = (orderId, bodyUpdate) => {
    return Order.findByIdAndUpdate(orderId, bodyUpdate, { new: true })
-      .populate("orderItems.vehicle", "name price")
-      .populate("user", "name phoneNumber");
+      .populate("orderItems.vehicle", "name price overtimeFee images")
+      .populate("user", "name phoneNumber")
+      .populate("facility", "name");
 };
 
 exports.deleteOrder = async orderId => {
@@ -45,8 +48,9 @@ exports.updateOrderPayment = (orderId, type) => {
       },
       { new: true },
    )
-      .populate("orderItems.vehicle", "name price")
-      .populate("user", "name phoneNumber");
+      .populate("orderItems.vehicle", "name price overtimeFee images")
+      .populate("user", "name phoneNumber")
+      .populate("facility", "name");
 };
 
 exports.requestToMoMo = (options, requestBody, res) => {
