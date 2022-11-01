@@ -45,6 +45,17 @@ class OrderController {
       }
    };
 
+   vehicleUsing = async (req, res, next) => {
+      try {
+         res.json({
+            using: await OrderService.vehicleUse(req.body),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    deleteOrder = async (req, res, next) => {
       try {
          await OrderService.deleteOrder(req.params.id);

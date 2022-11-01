@@ -60,6 +60,42 @@ exports.userSpend = async body => {
    return spending;
 };
 
+exports.vehicleUse = async body => {
+   let orders = await Order.find({
+      orderStatus: "Success",
+   }).select("orderStatus totalPrice fromDate orderItems");
+
+   const using = [];
+
+   orders = orders.filter(order => {
+      let output = false;
+      order.orderItems.forEach(item => {
+         if (item.vehicle.toString() === body.vehicleId) {
+            output = true;
+            return;
+         }
+      });
+      return output;
+   });
+
+   orders = orders.filter(
+      order => new Date(order.fromDate).getFullYear() === body.year,
+   );
+
+   for (let i = 1; i <= 12; i++) {
+      using.push(
+         orders.reduce((previousValue, currentValue) => {
+            if (i === new Date(currentValue.fromDate).getMonth() + 1) {
+               return (previousValue += 1);
+            }
+            return (previousValue += 0);
+         }, 0),
+      );
+   }
+
+   return using;
+};
+
 exports.deleteOrder = async orderId => {
    const order = await Order.findById(orderId);
    if (!order) {

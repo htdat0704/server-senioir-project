@@ -35,6 +35,13 @@ router.post(
    OrderController.userSpending,
 );
 
+router.post(
+   "/using",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.vehicleUsing,
+);
+
 router.delete(
    "/delete/:id",
    isAuthenticatedUser,
