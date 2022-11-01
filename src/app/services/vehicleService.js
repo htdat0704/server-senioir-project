@@ -174,7 +174,8 @@ exports.addVehicleReview = async (vehicleId, review) => {
    });
 
    vehicle.ratings = (avg / vehicle.reviews.length).toFixed(1);
-   return await vehicle.save({ validateBeforeSave: false });
+   await vehicle.save({ validateBeforeSave: false });
+   return Vehicle.findById(vehicleId).populate("reviews.user", "avatar name");
 };
 
 exports.findAllVehicleReview = async (resultPerPage = 0) => {
