@@ -17,6 +17,8 @@ router.get(
 
 router.post("/create", isAuthenticatedUser, OrderController.createOrder);
 
+router.get("/myOrders", isAuthenticatedUser, OrderController.myOrders);
+
 router.get("/:id", isAuthenticatedUser, OrderController.getOneOrder);
 
 router.put(
@@ -24,6 +26,13 @@ router.put(
    isAuthenticatedUser,
    authorizeRole("admin"),
    OrderController.updateOrder,
+);
+
+router.post(
+   "/spending",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.userSpending,
 );
 
 router.delete(

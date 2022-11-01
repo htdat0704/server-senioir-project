@@ -13,7 +13,7 @@ exports.registerUser = (
    name,
    email,
    hashedPassword,
-   avatar = "img",
+   avatar = process.env.IMG_DEFAULT,
    idImage = "id_img",
 ) => {
    const user = new User({
