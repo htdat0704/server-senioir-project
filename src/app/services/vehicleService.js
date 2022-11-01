@@ -35,7 +35,9 @@ exports.createNewVehicle = async bodyCreate => {
 };
 
 exports.findById = async id => {
-   return Vehicle.findById(id).populate("facility", "name location");
+   return Vehicle.findById(id)
+      .populate("facility", "name location")
+      .populate("reviews.user", "avatar name");
 };
 
 exports.updateVehicle = async (idVehicle, bodyUpdate) => {
@@ -176,7 +178,9 @@ exports.addVehicleReview = async (vehicleId, review) => {
 };
 
 exports.findAllVehicleReview = async (resultPerPage = 0) => {
-   const vehicles = await Vehicle.find().lean();
+   const vehicles = await Vehicle.find()
+      .populate("reviews.user", "avatar name")
+      .lean();
 
    let AllReviews = [];
 
@@ -188,6 +192,7 @@ exports.findAllVehicleReview = async (resultPerPage = 0) => {
             AllReviews.push(rv);
          });
    });
+
    return AllReviews;
 };
 

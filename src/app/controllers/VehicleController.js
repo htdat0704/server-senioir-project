@@ -102,7 +102,6 @@ class VehilceController {
          const { rating, comment, vehicleId } = req.body;
          const review = {
             user: req.user._id,
-            name: req.user.name,
             comment,
             rating: +rating,
          };
