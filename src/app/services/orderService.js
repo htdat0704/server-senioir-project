@@ -36,6 +36,30 @@ exports.updateOrder = (orderId, bodyUpdate) => {
       .populate("facility", "name");
 };
 
+exports.userSpend = async body => {
+   let orders = await Order.find({
+      user: body.userId,
+      orderStatus: "Success",
+   }).select("orderStatus totalPrice fromDate");
+   const spending = [];
+
+   orders = orders.filter(
+      order => new Date(order.fromDate).getFullYear() === body.year,
+   );
+
+   for (let i = 1; i <= 12; i++) {
+      spending.push(
+         orders.reduce((previousValue, currentValue) => {
+            if (i === new Date(currentValue.fromDate).getMonth() + 1) {
+               return (previousValue += +currentValue.totalPrice);
+            }
+            return (previousValue += 0);
+         }, 0),
+      );
+   }
+   return spending;
+};
+
 exports.deleteOrder = async orderId => {
    const order = await Order.findById(orderId);
    if (!order) {

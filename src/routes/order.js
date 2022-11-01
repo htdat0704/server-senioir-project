@@ -28,6 +28,13 @@ router.put(
    OrderController.updateOrder,
 );
 
+router.post(
+   "/spending",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.userSpending,
+);
+
 router.delete(
    "/delete/:id",
    isAuthenticatedUser,

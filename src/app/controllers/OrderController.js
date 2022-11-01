@@ -36,6 +36,10 @@ class OrderController {
 
    userSpending = async (req, res, next) => {
       try {
+         res.json({
+            spending: await OrderService.userSpend(req.body),
+            success: true,
+         });
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
@@ -55,7 +59,6 @@ class OrderController {
    updateOrder = async (req, res, next) => {
       try {
          let order = await OrderService.findById(req.params.id);
-
          if (req.body.overtimeHour) {
             req.body.overtimeFee =
                order.orderItems.reduce(
@@ -68,7 +71,7 @@ class OrderController {
          }
 
          if (req.body.orderStatus === "Success") {
-            await UserService.updateNumberOfRental(order.user);
+            await UserService.updateNumberOfRental(order.user._id);
             for (let obj of order.orderItems) {
                await VehicleService.updateNumberOfRental(obj.vehicle._id);
             }
