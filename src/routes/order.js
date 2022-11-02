@@ -28,6 +28,27 @@ router.put(
    OrderController.updateOrder,
 );
 
+router.get(
+   "/facility/lastOrders/:facilityId",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.facilityLastOrders,
+);
+
+router.get(
+   "/vehicle/lastOrders/:vehicleId",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.vehicleLastOrders,
+);
+
+router.get(
+   "/user/lastOrders/:userId",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.userLastOrders,
+);
+
 router.post(
    "/spending",
    isAuthenticatedUser,

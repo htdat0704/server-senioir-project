@@ -34,6 +34,41 @@ class OrderController {
       }
    };
 
+   userLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.userLastOrders(req.params.userId),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   facilityLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.facilityLastOrders(
+               req.params.facilityId,
+            ),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   vehicleLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.vehicleLastOrders(req.params.vehicleId),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    userSpending = async (req, res, next) => {
       try {
          res.json({
@@ -99,7 +134,10 @@ class OrderController {
             }
          }
 
-         if (req.body.orderStatus === "Going") {
+         if (
+            req.body.orderStatus === "Going" ||
+            req.body.orderStatus === "Success"
+         ) {
             req.body.payment = {
                paymentType: order.payment.paymentType,
                paymentStatus: "Paid",
