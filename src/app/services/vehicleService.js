@@ -1,5 +1,6 @@
 const cloudinary = require("cloudinary");
 const Vehicle = require("../model/Vehicle");
+const Feature = require("../model/Feature");
 const ApiFeatures = require("../../utils/ApiFeatures");
 
 exports.createNewVehicle = async bodyCreate => {
@@ -120,7 +121,10 @@ exports.deleteVehicle = async vehicleId => {
 exports.findAllVehicle = async (query, resultPerPage = 0, selected) => {
    const VehicleCount = await Vehicle.countDocuments();
    const apiFeaturesFilter = new ApiFeatures(
-      Vehicle.find().populate("facility", "name location").select(selected),
+      Vehicle.find()
+         .populate("facility", "name location")
+         .select(selected)
+         .sort({ _id: -1 }),
       query,
    )
       .searchByName()
@@ -131,7 +135,10 @@ exports.findAllVehicle = async (query, resultPerPage = 0, selected) => {
 
    if (resultPerPage) {
       const apiFeaturesFilterPaginagtion = new ApiFeatures(
-         Vehicle.find().populate("facility", "name location").select(selected),
+         Vehicle.find()
+            .populate("facility", "name location")
+            .select(selected)
+            .sort({ _id: -1 }),
          query,
       )
          .searchByName()
@@ -181,6 +188,7 @@ exports.addVehicleReview = async (vehicleId, review) => {
 exports.findAllVehicleReview = async (resultPerPage = 0) => {
    const vehicles = await Vehicle.find()
       .populate("reviews.user", "avatar name")
+      .sort({ _id: -1 })
       .lean();
 
    let AllReviews = [];
@@ -263,4 +271,39 @@ exports.updateNumberOfRental = async idVehicle => {
       { numberOfRental },
       { new: true },
    );
+};
+
+exports.countVehicle = async () => {
+   const vehicles = await Vehicle.find().select("createdAt");
+
+   return {
+      countTotal: vehicles.length,
+      countThisMonth:
+         vehicles.filter(
+            vehicle =>
+               new Date(vehicle.createdAt).getMonth() ===
+                  new Date().getMonth() &&
+               new Date(vehicle.createdAt).getFullYear() ===
+                  new Date().getFullYear(),
+         ).length ?? 0,
+   };
+};
+
+exports.findAllFeatures = () => {
+   return Feature.find().select("label value").sort({ _id: -1 });
+};
+
+exports.createNewFeature = async bodyCreate => {
+   const feature = await Feature.findOne({ value: bodyCreate.value });
+
+   if (feature) {
+      throw new Error("feature value already have");
+   }
+
+   const featureCreate = new Feature(bodyCreate);
+   return featureCreate.save();
+};
+
+exports.deleteFeature = value => {
+   return Feature.findOneAndDelete({ value });
 };

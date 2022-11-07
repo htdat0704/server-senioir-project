@@ -34,6 +34,28 @@ class OrderController {
       }
    };
 
+   dashboardLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.dashboardLastOrders(),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   revenue = async (req, res, next) => {
+      try {
+         res.json({
+            revenue: await OrderService.revenue(req.params.year),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    userLastOrders = async (req, res, next) => {
       try {
          res.json({
@@ -141,6 +163,13 @@ class OrderController {
             req.body.payment = {
                paymentType: order.payment.paymentType,
                paymentStatus: "Paid",
+            };
+         }
+
+         if (req.body.orderStatus === "Cancel") {
+            req.body.payment = {
+               paymentType: order.payment.paymentType,
+               paymentStatus: "Unpaid",
             };
          }
 

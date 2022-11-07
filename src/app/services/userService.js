@@ -1,5 +1,6 @@
 const User = require("../model/User");
 const cloudinary = require("cloudinary");
+const Order = require("../model/Order");
 
 exports.findByEmail = email => {
    return User.findOne({ email });
@@ -115,12 +116,18 @@ exports.deleteUser = async userId => {
    if (!user) {
       throw new Error("User not found");
    }
+   let orders = await Order.find({ user: userId });
+
+   for (let order of orders) {
+      await order.delete();
+   }
+
    await cloudinary.v2.uploader.destroy(user.avatar.public_id);
    return user.delete();
 };
 
 exports.findAllUser = () => {
-   return User.find();
+   return User.find().sort({ _id: -1 });
 };
 
 exports.updateNumberOfRental = async idUser => {
@@ -132,4 +139,19 @@ exports.updateNumberOfRental = async idUser => {
       numberOfRental = +user.numberOfRental + 1;
    }
    return User.findByIdAndUpdate(idUser, { numberOfRental }, { new: true });
+};
+
+exports.countUser = async () => {
+   const users = await User.find().select("createdAt");
+
+   return {
+      countTotal: users.length,
+      countThisMonth:
+         users.filter(
+            user =>
+               new Date(user.createdAt).getMonth() === new Date().getMonth() &&
+               new Date(user.createdAt).getFullYear() ===
+                  new Date().getFullYear(),
+         ).length ?? 0,
+   };
 };
