@@ -52,6 +52,10 @@ exports.updateVehicle = async (idVehicle, bodyUpdate) => {
       throw new Error("Vehicle not found");
    }
 
+   if (bodyUpdate.overtimeFee > bodyUpdate.price) {
+      throw new Error("OvertimeFee higher than Price");
+   }
+
    if (bodyUpdate.isUpdateImages) {
       if (typeof bodyUpdate.images === "String") {
          images.push(bodyUpdate, images);
@@ -96,6 +100,7 @@ exports.updateVehicle = async (idVehicle, bodyUpdate) => {
             seats: bodyUpdate.seats,
             facility: bodyUpdate.facility,
             brand: bodyUpdate.brand,
+            overtimeFee: bodyUpdate.overtimeFee,
          },
          {
             new: true,
