@@ -57,6 +57,13 @@ router.put(
    UserController.updateUserAdmin,
 );
 
+router.get(
+   "/dashboard/widgets",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.widgetDashboard,
+);
+
 // // router.get('/details/:id', UserController.detailsProduct);
 // // router.get('/', UserController.getAllProduct);
 

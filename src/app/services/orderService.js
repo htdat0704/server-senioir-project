@@ -3,6 +3,12 @@ const https = require("https");
 const Order = require("../model/Order");
 
 exports.createOrder = bodyCreate => {
+   if (!bodyCreate.pickUpLocation) {
+      bodyCreate.pickUpLocation = "At garage";
+   }
+   if (bodyCreate.orderItems.length === 0) {
+      throw new Error("No Item have been selected");
+   }
    const order = new Order(bodyCreate);
    return order.save();
 };
@@ -18,7 +24,8 @@ exports.findByUser = userId => {
    return Order.find({ user: userId })
       .populate("orderItems.vehicle", "name price images overtimeFee")
       .populate("user", "name phoneNumber")
-      .populate("facility", "name");
+      .populate("facility", "name")
+      .sort({ _id: -1 });
 };
 
 exports.findAll = () => {
@@ -26,6 +33,7 @@ exports.findAll = () => {
       .populate("orderItems.vehicle", "name price overtimeFee")
       .populate("user", "name phoneNumber")
       .populate("facility", "name")
+      .sort({ fromDate: -1 })
       .lean();
 };
 
@@ -36,11 +44,51 @@ exports.updateOrder = (orderId, bodyUpdate) => {
       .populate("facility", "name");
 };
 
+exports.revenue = async year => {
+   let orders = await Order.find({
+      orderStatus: "Success",
+   }).select("orderStatus totalPrice fromDate");
+
+   orders = orders.filter(
+      order => new Date(order.fromDate).getFullYear() === +year,
+   );
+
+   const revenue = [];
+
+   for (let i = 1; i <= 12; i++) {
+      revenue.push(
+         orders.reduce((previousValue, currentValue) => {
+            if (i === new Date(currentValue.fromDate).getMonth() + 1) {
+               return (previousValue += +currentValue.totalPrice);
+            }
+            return (previousValue += 0);
+         }, 0),
+      );
+   }
+   return {
+      revenue,
+      total: revenue.reduce(
+         (previousValue, currentValue) => (previousValue += currentValue),
+         0,
+      ),
+   };
+};
+
+exports.dashboardLastOrders = () => {
+   return Order.find()
+      .select("orderStatus totalPrice fromDate endDate payment facility user")
+      .populate("user", "name phoneNumber avatar")
+      .populate("facility", "name")
+      .sort({ fromDate: -1 })
+      .limit(20);
+};
+
 exports.userLastOrders = userId => {
    return Order.find({
       user: userId,
    })
       .select("orderStatus totalPrice fromDate endDate payment")
+      .sort({ fromDate: -1 })
       .limit(10);
 };
 
@@ -48,7 +96,8 @@ exports.vehicleLastOrders = async vehicleId => {
    let orders = await Order.find()
       .lean()
       .select("orderStatus fromDate endDate payment orderItems user")
-      .populate("user", "name phoneNumber avatar");
+      .populate("user", "name phoneNumber avatar")
+      .sort({ fromDate: -1 });
 
    orders = orders.filter(order => {
       let output = false;
@@ -75,14 +124,17 @@ exports.facilityLastOrders = facilityId => {
       .lean()
       .limit(25)
       .select("orderStatus fromDate endDate payment facility user totalPrice")
-      .populate("user", "name phoneNumber avatar");
+      .populate("user", "name phoneNumber avatar")
+      .sort({ fromDate: -1 });
 };
 
 exports.userSpend = async body => {
    let orders = await Order.find({
       user: body.userId,
       orderStatus: "Success",
-   }).select("orderStatus totalPrice fromDate");
+   })
+      .select("orderStatus totalPrice fromDate")
+      .sort({ fromDate: -1 });
    const spending = [];
 
    orders = orders.filter(
@@ -99,14 +151,23 @@ exports.userSpend = async body => {
          }, 0),
       );
    }
-   return spending;
+
+   return {
+      spending,
+      totalSpend: spending.reduce(
+         (previousValue, currentValue) => (previousValue += currentValue),
+         0,
+      ),
+   };
 };
 
 exports.facilityEarn = async body => {
    let orders = await Order.find({
       facility: body.facilityId,
       orderStatus: "Success",
-   }).select("orderStatus totalPrice fromDate facility");
+   })
+      .select("orderStatus totalPrice fromDate facility")
+      .sort({ fromDate: -1 });
    const earning = [];
 
    orders = orders.filter(
@@ -123,13 +184,21 @@ exports.facilityEarn = async body => {
          }, 0),
       );
    }
-   return earning;
+   return {
+      earning,
+      totalEarn: earning.reduce(
+         (previousValue, currentValue) => (previousValue += currentValue),
+         0,
+      ),
+   };
 };
 
 exports.vehicleUse = async body => {
    let orders = await Order.find({
       orderStatus: "Success",
-   }).select("orderStatus totalPrice fromDate orderItems");
+   })
+      .select("orderStatus totalPrice fromDate orderItems")
+      .sort({ fromDate: -1 });
 
    const using = [];
 
@@ -159,7 +228,13 @@ exports.vehicleUse = async body => {
       );
    }
 
-   return using;
+   return {
+      using,
+      totalUse: using.reduce(
+         (previousValue, currentValue) => (previousValue += currentValue),
+         0,
+      ),
+   };
 };
 
 exports.deleteOrder = async orderId => {
@@ -198,7 +273,7 @@ exports.requestToMoMo = (options, requestBody, res) => {
       response.on("end", () => {
          console.log("No more data in response.");
          console.log(bodyRequest);
-         res.redirect(JSON.parse(bodyRequest).payUrl);
+         res.redirect(JSON.parse(bodyRequest).deeplink);
       });
    });
    request.on("error", e => {
@@ -208,4 +283,45 @@ exports.requestToMoMo = (options, requestBody, res) => {
    console.log("Sending....");
    request.write(requestBody);
    request.end();
+};
+
+exports.countOrder = async () => {
+   const orders = await Order.find().select("fromDate");
+
+   return {
+      countTotal: orders.length,
+      countThisMonth:
+         orders.filter(
+            order =>
+               new Date(order.fromDate).getMonth() === new Date().getMonth() &&
+               new Date(order.fromDate).getFullYear() ===
+                  new Date().getFullYear(),
+         ).length ?? 0,
+   };
+};
+
+exports.countEarn = async () => {
+   const orders = await Order.find().select("fromDate orderStatus totalPrice");
+
+   const ordersMonthNow = orders.filter(
+      order =>
+         new Date(order.fromDate).getMonth() === new Date().getMonth() &&
+         new Date(order.fromDate).getFullYear() === new Date().getFullYear() &&
+         order.orderStatus === "Success",
+   );
+
+   const ordersThisDay = ordersMonthNow.filter(
+      order => new Date(order.fromDate).getDate() === new Date().getDate(),
+   );
+
+   return {
+      countTotal: ordersMonthNow.reduce(
+         (previous, current) => (previous += current.totalPrice),
+         0,
+      ),
+      countThisMonth: ordersThisDay.reduce(
+         (previous, current) => (previous += current.totalPrice),
+         0,
+      ),
+   };
 };

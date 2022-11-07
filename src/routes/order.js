@@ -21,6 +21,20 @@ router.get("/myOrders", isAuthenticatedUser, OrderController.myOrders);
 
 router.get("/:id", isAuthenticatedUser, OrderController.getOneOrder);
 
+router.get(
+   "/dashboard/revenue/:year",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.revenue,
+);
+
+router.get(
+   "/dashboard/lastOrders",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.dashboardLastOrders,
+);
+
 router.put(
    "/update/:id",
    isAuthenticatedUser,
