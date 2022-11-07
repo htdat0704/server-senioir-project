@@ -4,6 +4,8 @@ const cloundinary = require("cloudinary");
 const passport = require("passport");
 
 const UserService = require("../services/userService");
+const VehicleService = require("../services/vehicleService");
+const OrderService = require("../services/orderService");
 const ErrorHander = require("../../utils/errorhandler");
 const sendEmail = require("../../utils/sendEmail");
 const sendToken = require("../../utils/sendToken");
@@ -26,6 +28,42 @@ class UserController {
 
          if (!passwordValid) {
             return next(new ErrorHander("Username or Password invalid", 400));
+         }
+
+         const accessToken = jwt.sign(
+            { userId: userFound._id },
+            process.env.ACCESS_TOKEN_SECRET,
+         );
+
+         sendToken(userFound, accessToken, res);
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   loginAdmin = async (req, res, next) => {
+      try {
+         const { email, password } = req.body;
+
+         const userFound = await UserService.foundUserWithPassowrd(email);
+
+         if (!userFound) {
+            return next(new ErrorHander("Username or Password invalid", 400));
+         }
+
+         const passwordValid = await argon2.verify(
+            userFound.password,
+            password,
+         );
+
+         if (!passwordValid) {
+            return next(new ErrorHander("Username or Password invalid", 400));
+         }
+
+         if (userFound.role !== "admin") {
+            return next(
+               new ErrorHander("Account does not have permission to login"),
+            );
          }
 
          const accessToken = jwt.sign(
@@ -68,8 +106,20 @@ class UserController {
       }
    };
 
-   logout = async (req, res) => {
-      res.json({ success });
+   logout = async (req, res, next) => {
+      try {
+         res.cookie("token", null, {
+            expires: new Date(Date.now()),
+            httpOnly: true,
+         });
+
+         res.json({
+            success: true,
+            message: "logout User",
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 401));
+      }
    };
 
    forgetPassword = async (req, res, next) => {
@@ -250,6 +300,67 @@ class UserController {
             return next(new ErrorHander("User not found", 400));
          }
          res.json({ success: true, user });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   widgetDashboard = async (req, res, next) => {
+      try {
+         res.json({
+            success: true,
+            user: await UserService.countUser(),
+            vehicle: await VehicleService.countVehicle(),
+            orders: await OrderService.countOrder(),
+            earn: await OrderService.countEarn(),
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   detailsAdmin = async (req, res, next) => {
+      try {
+         res.json({
+            success: true,
+            user: req.user,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   loginAdmin = async (req, res, next) => {
+      try {
+         const { email, password } = req.body;
+
+         const userFound = await UserService.foundUserWithPassowrd(email);
+
+         if (!userFound) {
+            return next(new ErrorHander("Username or Password invalid", 400));
+         }
+
+         const passwordValid = await argon2.verify(
+            userFound.password,
+            password,
+         );
+
+         if (!passwordValid) {
+            return next(new ErrorHander("Username or Password invalid", 400));
+         }
+
+         if (userFound.role !== "admin") {
+            return next(
+               new ErrorHander("Account does not have permission to login"),
+            );
+         }
+
+         const accessToken = jwt.sign(
+            { userId: userFound._id },
+            process.env.ACCESS_TOKEN_SECRET,
+         );
+
+         sendToken(userFound, accessToken, res);
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }

@@ -50,6 +50,13 @@ router.delete(
    UserController.deleteUser,
 );
 
+router.get(
+   "/dashboard/widgets",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.widgetDashboard,
+);
+
 router.put(
    "/admin/update/:id",
    isAuthenticatedUser,

@@ -12,6 +12,14 @@ const UserController = require("../app/controllers/UserController");
 router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 
+router.post("/admin/login", UserController.loginAdmin);
+router.get(
+   "/admin/details",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.detailsAdmin,
+);
+
 router.get("/logout", UserController.logout);
 
 router.get(
