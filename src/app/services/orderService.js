@@ -36,6 +36,48 @@ exports.updateOrder = (orderId, bodyUpdate) => {
       .populate("facility", "name");
 };
 
+exports.userLastOrders = userId => {
+   return Order.find({
+      user: userId,
+   })
+      .select("orderStatus totalPrice fromDate endDate payment")
+      .limit(10);
+};
+
+exports.vehicleLastOrders = async vehicleId => {
+   let orders = await Order.find()
+      .lean()
+      .select("orderStatus fromDate endDate payment orderItems user")
+      .populate("user", "name phoneNumber avatar");
+
+   orders = orders.filter(order => {
+      let output = false;
+      order.orderItems.forEach(item => {
+         if (item.vehicle.toString() === vehicleId) {
+            output = true;
+            return;
+         }
+      });
+      return output;
+   });
+
+   if (orders.length > 10) {
+      orders = orders.slice(0, 10);
+   }
+
+   return orders;
+};
+
+exports.facilityLastOrders = facilityId => {
+   return Order.find({
+      facility: facilityId,
+   })
+      .lean()
+      .limit(25)
+      .select("orderStatus fromDate endDate payment facility user totalPrice")
+      .populate("user", "name phoneNumber avatar");
+};
+
 exports.userSpend = async body => {
    let orders = await Order.find({
       user: body.userId,
