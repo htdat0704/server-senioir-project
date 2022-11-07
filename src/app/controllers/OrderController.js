@@ -34,10 +34,89 @@ class OrderController {
       }
    };
 
+   dashboardLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.dashboardLastOrders(),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   revenue = async (req, res, next) => {
+      try {
+         res.json({
+            revenue: await OrderService.revenue(req.params.year),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   userLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.userLastOrders(req.params.userId),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   facilityLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.facilityLastOrders(
+               req.params.facilityId,
+            ),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   vehicleLastOrders = async (req, res, next) => {
+      try {
+         res.json({
+            orders: await OrderService.vehicleLastOrders(req.params.vehicleId),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    userSpending = async (req, res, next) => {
       try {
          res.json({
             spending: await OrderService.userSpend(req.body),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   vehicleUsing = async (req, res, next) => {
+      try {
+         res.json({
+            using: await OrderService.vehicleUse(req.body),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   factoryEarning = async (req, res, next) => {
+      try {
+         res.json({
+            earning: await OrderService.facilityEarn(req.body),
             success: true,
          });
       } catch (e) {
@@ -77,10 +156,20 @@ class OrderController {
             }
          }
 
-         if (req.body.orderStatus === "Going") {
+         if (
+            req.body.orderStatus === "Going" ||
+            req.body.orderStatus === "Success"
+         ) {
             req.body.payment = {
                paymentType: order.payment.paymentType,
                paymentStatus: "Paid",
+            };
+         }
+
+         if (req.body.orderStatus === "Cancel") {
+            req.body.payment = {
+               paymentType: order.payment.paymentType,
+               paymentStatus: "Unpaid",
             };
          }
 

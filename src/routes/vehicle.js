@@ -19,6 +19,14 @@ router.get(
 
 router.get("/reviews", VehicleController.getAllReviews);
 
+router.get("/:id", VehicleController.getSingleVehicle);
+
+router.put(
+   "/review",
+   isAuthenticatedUser,
+   VehicleController.createVehicleReview,
+);
+
 router.get(
    "/features",
    isAuthenticatedUser,
@@ -38,12 +46,6 @@ router.delete(
    isAuthenticatedUser,
    authorizeRole("admin"),
    VehicleController.deleteFeature,
-);
-
-router.put(
-   "/review",
-   isAuthenticatedUser,
-   VehicleController.createVehicleReview,
 );
 
 router.get(
@@ -87,7 +89,5 @@ router.post(
    authorizeRole("admin"),
    VehicleController.createVehicle,
 );
-
-router.get("/:id", VehicleController.getSingleVehicle);
 
 module.exports = router;

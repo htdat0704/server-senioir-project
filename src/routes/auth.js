@@ -5,11 +5,12 @@ const {
    isAuthenticatedUser,
    authorizeRole,
 } = require("../app/middlewares/auth");
-const { isTokenResetValid } = require("../app/middlewares/confirmReset");
+// const { isTokenResetValid } = require("../app/middlewares/confirmReset");
 
 const UserController = require("../app/controllers/UserController");
 
 router.post("/register", UserController.register);
+
 router.post("/login", UserController.login);
 
 router.post("/admin/login", UserController.loginAdmin);

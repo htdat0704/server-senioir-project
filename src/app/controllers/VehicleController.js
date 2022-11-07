@@ -160,6 +160,42 @@ class VehilceController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   getAllFeatures = async (req, res, next) => {
+      try {
+         res.json({
+            allFeatures: await VehicleService.findAllFeatures(),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   createFeature = async (req, res, next) => {
+      try {
+         const feature = await VehicleService.createNewFeature(req.body);
+
+         res.json({
+            feature,
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   deleteFeature = async (req, res, next) => {
+      try {
+         await VehicleService.deleteFeature(req.params.value);
+
+         res.json({
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
 }
 
 module.exports = new VehilceController();
