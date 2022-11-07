@@ -42,6 +42,13 @@ router.post(
    OrderController.vehicleUsing,
 );
 
+router.post(
+   "/earning",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.factoryEarning,
+);
+
 router.delete(
    "/delete/:id",
    isAuthenticatedUser,

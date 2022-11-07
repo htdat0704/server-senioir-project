@@ -56,6 +56,17 @@ class OrderController {
       }
    };
 
+   factoryEarning = async (req, res, next) => {
+      try {
+         res.json({
+            earning: await OrderService.facilityEarn(req.body),
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    deleteOrder = async (req, res, next) => {
       try {
          await OrderService.deleteOrder(req.params.id);
