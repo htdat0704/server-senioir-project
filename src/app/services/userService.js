@@ -92,7 +92,7 @@ exports.updatePassword = (idUser, hashPassowrd) => {
 };
 
 exports.updateProfile = async (idUser, bodyUpdate) => {
-   if (!isVietnamesePhoneNumberValid(+bodyUpdate.phoneNumber)) {
+   if (!isVietnamesePhoneNumberValid(bodyUpdate.phoneNumber)) {
       throw new Error("Invalid Phone Number");
    }
 

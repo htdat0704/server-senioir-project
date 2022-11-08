@@ -229,6 +229,7 @@ class OrderController {
             extraData.toString(),
             "MoMo",
          );
+         res.redirect("exp://192.168.21.166:19000");
 
          res.json({
             order,
