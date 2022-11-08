@@ -6,6 +6,22 @@ const ApiFeatures = require("../../utils/ApiFeatures");
 exports.createNewVehicle = async bodyCreate => {
    let images = [];
 
+   if (bodyCreate.overtimeFee > bodyCreate.price) {
+      throw new Error("OvertimeFee higher than Price");
+   }
+
+   if (bodyCreate.seats > 47) {
+      throw new Error("No Vehicle have more than 47 seats");
+   }
+
+   if (bodyCreate.category === "SCOOTER" && bodyCreate.seats > 5) {
+      throw new Error("That's too many seats for a SCOOTER");
+   }
+
+   if (bodyCreate.price > 100000000) {
+      throw new Error("Price is too High");
+   }
+
    if (typeof bodyCreate.images === "String") {
       images.push(bodyCreate, images);
    } else {
@@ -54,6 +70,18 @@ exports.updateVehicle = async (idVehicle, bodyUpdate) => {
 
    if (bodyUpdate.overtimeFee > bodyUpdate.price) {
       throw new Error("OvertimeFee higher than Price");
+   }
+
+   if (bodyUpdate.seats > 47) {
+      throw new Error("No Vehicle have more than 47 seats");
+   }
+
+   if (bodyUpdate.category === "SCOOTER" && bodyUpdate.seats > 5) {
+      throw new Error("That's too many seats for a SCOOTER");
+   }
+
+   if (bodyUpdate.price > 100000000) {
+      throw new Error("Price is too High");
    }
 
    if (bodyUpdate.isUpdateImages) {
@@ -299,10 +327,12 @@ exports.findAllFeatures = () => {
 };
 
 exports.createNewFeature = async bodyCreate => {
-   const feature = await Feature.findOne({ value: bodyCreate.value });
-
-   if (feature) {
+   if (await Feature.findOne({ value: bodyCreate.value })) {
       throw new Error("feature value already have");
+   }
+
+   if (await Feature.findOne({ label: bodyCreate.label })) {
+      throw new Error("feature label already have");
    }
 
    const featureCreate = new Feature(bodyCreate);

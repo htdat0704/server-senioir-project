@@ -1,6 +1,7 @@
 const User = require("../model/User");
 const cloudinary = require("cloudinary");
 const Order = require("../model/Order");
+const { isVietnamesePhoneNumberValid } = require("../../utils/validate");
 
 exports.findByEmail = email => {
    return User.findOne({ email });
@@ -91,6 +92,14 @@ exports.updatePassword = (idUser, hashPassowrd) => {
 };
 
 exports.updateProfile = async (idUser, bodyUpdate) => {
+   if (!isVietnamesePhoneNumberValid(+bodyUpdate.phoneNumber)) {
+      throw new Error("Invalid Phone Number");
+   }
+
+   if (+bodyUpdate.age > 150) {
+      throw new Error("That's too old");
+   }
+
    if (bodyUpdate.isUpdateImage) {
       let user = await User.findById(idUser);
 

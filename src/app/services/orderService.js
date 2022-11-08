@@ -273,7 +273,9 @@ exports.requestToMoMo = (options, requestBody, res) => {
       response.on("end", () => {
          console.log("No more data in response.");
          console.log(bodyRequest);
-         res.redirect(JSON.parse(bodyRequest).deeplink);
+         res.json({
+            deeplink: JSON.parse(bodyRequest).deeplink,
+         });
       });
    });
    request.on("error", e => {

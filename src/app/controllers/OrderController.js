@@ -166,7 +166,10 @@ class OrderController {
             };
          }
 
-         if (req.body.orderStatus === "Cancel") {
+         if (
+            req.body.orderStatus === "Cancel" ||
+            req.body.orderStatus === "Processing"
+         ) {
             req.body.payment = {
                paymentType: order.payment.paymentType,
                paymentStatus: "Unpaid",
@@ -238,6 +241,9 @@ class OrderController {
 
    sendmomo = async (req, res, next) => {
       const order = await OrderService.findById(req.body.orderId);
+      if (!order) {
+         return next(new ErrorHander("Order not Found"), 404);
+      }
       if (order.payment.paymentStatus === "Paid") {
          return next(new ErrorHander("Order has been paid", 403));
       }
@@ -250,7 +256,7 @@ class OrderController {
       var redirectUrl = `${process.env.URL_WEBSITE}/order/payment/momo/success`;
       var ipnUrl = `${process.env.URL_WEBSITE}/order/payment/momo/success`;
       // var ipnUrl = redirectUrl = "https://webhook.site/454e7b77-f177-4ece-8236-ddf1c26ba7f8";
-      var amount = req.body.amount;
+      var amount = order.totalPrice ?? 0;
       var requestType = "captureWallet";
       var extraData = req.body.orderId; //pass empty value if your merchant does not have stores
       //before sign HMAC SHA256 with format
@@ -331,6 +337,7 @@ class OrderController {
          // console.log("Sending....");
          // request.write(requestBody);
          // request.end();
+
          await OrderService.requestToMoMo(options, requestBody, res);
       } catch (e) {
          return next(new ErrorHander(e, 400));
