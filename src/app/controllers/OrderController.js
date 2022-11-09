@@ -227,7 +227,7 @@ class OrderController {
          const { extraData } = req.query;
          const order = await OrderService.updateOrderPayment(
             extraData.toString(),
-            "MoMo",
+            "MOMO",
          );
          res.redirect("exp://192.168.21.166:19000");
 

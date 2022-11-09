@@ -6,7 +6,7 @@ const ApiFeatures = require("../../utils/ApiFeatures");
 exports.createNewVehicle = async bodyCreate => {
    let images = [];
 
-   if (bodyCreate.overtimeFee > bodyCreate.price) {
+   if (+bodyCreate.overtimeFee > +bodyCreate.price) {
       throw new Error("OvertimeFee higher than Price");
    }
 
@@ -18,7 +18,7 @@ exports.createNewVehicle = async bodyCreate => {
       throw new Error("That's too many seats for a SCOOTER");
    }
 
-   if (bodyCreate.price > 100000000) {
+   if (+bodyCreate.price > 100000000) {
       throw new Error("Price is too High");
    }
 
@@ -68,11 +68,11 @@ exports.updateVehicle = async (idVehicle, bodyUpdate) => {
       throw new Error("Vehicle not found");
    }
 
-   if (bodyUpdate.overtimeFee > bodyUpdate.price) {
+   if (+bodyUpdate.overtimeFee > +bodyUpdate.price) {
       throw new Error("OvertimeFee higher than Price");
    }
 
-   if (bodyUpdate.seats > 47) {
+   if (+bodyUpdate.seats > 47) {
       throw new Error("No Vehicle have more than 47 seats");
    }
 
@@ -80,7 +80,7 @@ exports.updateVehicle = async (idVehicle, bodyUpdate) => {
       throw new Error("That's too many seats for a SCOOTER");
    }
 
-   if (bodyUpdate.price > 100000000) {
+   if (+bodyUpdate.price > 100000000) {
       throw new Error("Price is too High");
    }
 
