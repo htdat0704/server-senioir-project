@@ -1,6 +1,8 @@
 const User = require("../model/User");
 const cloudinary = require("cloudinary");
 const Order = require("../model/Order");
+const Vehicle = require("../model/Vehicle");
+
 const { isVietnamesePhoneNumberValid } = require("../../utils/validate");
 
 exports.findByEmail = email => {
@@ -133,6 +135,28 @@ exports.deleteUser = async userId => {
 
    await cloudinary.v2.uploader.destroy(user.avatar.public_id);
    return user.delete();
+};
+
+exports.findUserReviews = async userId => {
+   let vehicles = await Vehicle.find();
+   const output = [];
+
+   vehicles = vehicles.filter(vehicle => {
+      let result = false;
+      vehicle.reviews.forEach(rv => {
+         if (rv.user.toString() === userId) {
+            output.push({
+               vehicleId: vehicle._id.toString(),
+               reviewId: rv._id.toString(),
+            });
+            result = true;
+            return;
+         }
+      });
+      return result;
+   });
+
+   return output;
 };
 
 exports.findAllUser = () => {

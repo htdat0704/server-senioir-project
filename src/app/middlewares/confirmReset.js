@@ -3,7 +3,7 @@ const ErrorHander = require("../../utils/errorhandler");
 
 exports.isTokenResetValid = async (req, res, next) => {
    const tokenReset = req.params.token;
-   console.log(tokenReset);
+
    if (!tokenReset) {
       return next(new ErrorHander("Token invalid", 404));
    }

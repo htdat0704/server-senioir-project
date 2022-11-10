@@ -79,7 +79,7 @@ exports.dashboardLastOrders = () => {
       .select("orderStatus totalPrice fromDate endDate payment facility user")
       .populate("user", "name phoneNumber avatar")
       .populate("facility", "name")
-      .sort({ fromDate: -1 })
+      .sort({ createdAt: -1 })
       .limit(20);
 };
 

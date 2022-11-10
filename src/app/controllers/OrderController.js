@@ -231,10 +231,10 @@ class OrderController {
          );
          res.redirect("exp://192.168.21.166:19000");
 
-         res.json({
-            order,
-            req: req.query,
-         });
+         // res.json({
+         //    order,
+         //    req: req.query,
+         // });
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
@@ -369,12 +369,13 @@ class OrderController {
          const orderId = req.query.vnp_OrderInfo.split(",")[1];
          const order = await OrderService.updateOrderPayment(orderId, "VNPAY");
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
-         res.json({
-            success: "success",
-            code: { code: vnp_Params["vnp_ResponseCode"] },
-            data: req.query,
-            order,
-         });
+         res.redirect("exp://192.168.21.166:19000");
+         // res.json({
+         //    success: "success",
+         //    code: { code: vnp_Params["vnp_ResponseCode"] },
+         //    data: req.query,
+         //    order,
+         // });
       } else {
          res.render("success", { code: "97" });
       }
