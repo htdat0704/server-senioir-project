@@ -229,7 +229,7 @@ class OrderController {
             extraData.toString(),
             "MOMO",
          );
-         res.redirect("exp://192.168.21.166:19000");
+         res.redirect(process.env.LINK_APP_PAYMENT);
 
          // res.json({
          //    order,
@@ -369,7 +369,7 @@ class OrderController {
          const orderId = req.query.vnp_OrderInfo.split(",")[1];
          const order = await OrderService.updateOrderPayment(orderId, "VNPAY");
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
-         res.redirect("exp://192.168.21.166:19000");
+         res.redirect(process.env.LINK_APP_PAYMENT);
          // res.json({
          //    success: "success",
          //    code: { code: vnp_Params["vnp_ResponseCode"] },

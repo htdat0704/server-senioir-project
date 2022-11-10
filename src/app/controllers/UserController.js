@@ -273,11 +273,11 @@ class UserController {
 
    deleteUser = async (req, res, next) => {
       try {
-         await UserService.deleteUser(req.params.id);
          const deleteReview = await UserService.findUserReviews(req.params.id);
          for (let rv of deleteReview) {
             await VehicleService.deleteReview(rv.vehicleId, rv.reviewId);
          }
+         await UserService.deleteUser(req.params.id);
          res.json({
             success: true,
          });
