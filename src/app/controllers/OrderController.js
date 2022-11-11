@@ -364,7 +364,7 @@ class OrderController {
       if (secureHash === signed) {
          //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
          const orderId = req.query.vnp_OrderInfo.split(",")[1];
-         await OrderService.updateOrderPayment(orderId, "VNPAY");
+         const order = await OrderService.updateOrderPayment(orderId, "VNPAY");
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
          res.redirect(process.env.LINK_APP_PAYMENT);
          // res.json({
@@ -395,7 +395,7 @@ class OrderController {
       var tmnCode = process.env.VNP_TMNCODE;
       var secretKey = process.env.VNP_HASHSECRET;
       var vnpUrl = process.env.VNP_URL;
-      var returnUrl = `${process.env.URL_WEBSITE}/order/sendVNPost/return`;
+      var returnUrl = process.env.VNP_ReturnUrl;
 
       var date = new Date();
 
@@ -440,9 +440,8 @@ class OrderController {
       var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
       vnp_Params["vnp_SecureHash"] = signed;
       vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
-
+      // console.log(vnpUrl);
       // res.redirect(vnpUrl);
-
       res.json({
          vnpUrl,
       });
