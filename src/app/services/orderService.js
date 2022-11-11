@@ -33,7 +33,7 @@ exports.findAll = () => {
       .populate("orderItems.vehicle", "name price overtimeFee")
       .populate("user", "name phoneNumber")
       .populate("facility", "name")
-      .sort({ fromDate: -1 })
+      .sort({ createdAt: -1 })
       .lean();
 };
 
@@ -76,7 +76,9 @@ exports.revenue = async year => {
 
 exports.dashboardLastOrders = () => {
    return Order.find()
-      .select("orderStatus totalPrice fromDate endDate payment facility user")
+      .select(
+         "orderStatus totalPrice fromDate endDate payment facility user createdAt",
+      )
       .populate("user", "name phoneNumber avatar")
       .populate("facility", "name")
       .sort({ createdAt: -1 })
@@ -253,6 +255,7 @@ exports.updateOrderPayment = (orderId, type) => {
             paymentType: type,
             paymentStatus: "Paid",
          },
+         orderStatus: "Confirm",
       },
       { new: true },
    )

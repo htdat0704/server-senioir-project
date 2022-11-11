@@ -151,6 +151,13 @@ exports.deleteVehicle = async vehicleId => {
    return vehicle.remove();
 };
 
+exports.findAllVehicleAdmin = selected => {
+   return Vehicle.find()
+      .populate("facility", "name location")
+      .select(selected)
+      .sort({ _id: -1 });
+};
+
 exports.findAllVehicle = async (query, resultPerPage = 0, selected) => {
    const VehicleCount = await Vehicle.countDocuments();
    const apiFeaturesFilter = new ApiFeatures(
@@ -341,4 +348,35 @@ exports.createNewFeature = async bodyCreate => {
 
 exports.deleteFeature = value => {
    return Feature.findOneAndDelete({ value });
+};
+
+exports.checkVehicleAvailable = async (vehicleId, quantity) => {
+   const vehicle = await Vehicle.findById(vehicleId);
+   if (vehicle.quantity === 0) {
+      throw new Error("Vehicle is not available");
+   }
+   if (vehicle.quantity < +quantity) {
+      throw new Error("Vehicle is not enough");
+   }
+};
+
+exports.downQuantityVehicle = async (vehicleId, quantity) => {
+   const vehicle = await Vehicle.findById(vehicleId);
+   if (vehicle.quantity < +quantity) {
+      throw new Error("Vehicle is not enough");
+   }
+   await Vehicle.findByIdAndUpdate(
+      vehicleId,
+      { quantity: vehicle.quantity - +quantity },
+      { new: true },
+   );
+};
+
+exports.increaseQuantityVehicle = async (vehicleId, quantity) => {
+   const vehicle = await Vehicle.findById(vehicleId);
+   await Vehicle.findByIdAndUpdate(
+      vehicleId,
+      { quantity: vehicle.quantity + +quantity },
+      { new: true },
+   );
 };

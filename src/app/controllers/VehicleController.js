@@ -23,16 +23,12 @@ class VehilceController {
 
    findAllVehicleByAdmin = async (req, res, next) => {
       try {
-         let result = { vehicles: "", filterCountProducts: 0, VehicleCount: 0 };
-
-         result = await VehicleService.findAllVehicle(
-            req.query,
-            req.body.resultPerPage,
+         const vehicles = await VehicleService.findAllVehicleAdmin(
             "-seats -description -response -numberOfRental -numOfReviews -reviews -feature",
          );
 
          res.json({
-            ...result,
+            vehicles,
             success: true,
          });
       } catch (e) {

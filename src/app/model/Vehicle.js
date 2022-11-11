@@ -54,7 +54,6 @@ const vehicleSchema = new mongoose.Schema({
    quantity: {
       type: Number,
       default: 1,
-      maxLength: [4, "Quantity can not exceed 4 characters"],
    },
    ratings: {
       type: Number,

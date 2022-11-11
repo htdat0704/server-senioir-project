@@ -183,7 +183,52 @@ class OrderController {
             };
          }
 
+         if (
+            order.payment.paymentType === "CASH" &&
+            req.body.orderStatus === "Confirm"
+         ) {
+            for (let item of order.orderItems) {
+               await VehicleService.checkVehicleAvailable(
+                  item.vehicle._id,
+                  item.quantity,
+               );
+            }
+         }
+
+         if (
+            order.orderStatus !== "Processing" &&
+            req.body.orderStatus === "Cancel"
+         ) {
+            for (let item of order.orderItems) {
+               await VehicleService.increaseQuantityVehicle(
+                  item.vehicle._id,
+                  item.quantity,
+               );
+            }
+         }
+
          order = await OrderService.updateOrder(req.params.id, req.body);
+
+         if (
+            order.payment.paymentType === "CASH" &&
+            order.orderStatus === "Confirm"
+         ) {
+            for (let item of order.orderItems) {
+               await VehicleService.downQuantityVehicle(
+                  item.vehicle._id,
+                  item.quantity,
+               );
+            }
+         }
+
+         if (order.orderStatus === "Success") {
+            for (let item of order.orderItems) {
+               await VehicleService.increaseQuantityVehicle(
+                  item.vehicle._id,
+                  item.quantity,
+               );
+            }
+         }
 
          res.json({
             success: true,
@@ -197,6 +242,13 @@ class OrderController {
    createOrder = async (req, res, next) => {
       try {
          req.body.user = req.user._id;
+
+         for (let item of body.orderItems) {
+            await VehicleService.checkVehicleAvailable(
+               item.vehicle._id,
+               item.quantity,
+            );
+         }
 
          let order = await OrderService.createOrder(req.body);
 
@@ -225,7 +277,16 @@ class OrderController {
    momoSuccess = async (req, res, next) => {
       try {
          const { extraData } = req.query;
-         await OrderService.updateOrderPayment(extraData.toString(), "MOMO");
+         const order = await OrderService.updateOrderPayment(
+            extraData.toString(),
+            "MOMO",
+         );
+         for (let item of order.orderItems) {
+            await VehicleService.downQuantityVehicle(
+               item.vehicle._id,
+               item.quantity,
+            );
+         }
          res.redirect(process.env.LINK_APP_PAYMENT);
 
          // res.json({
@@ -245,6 +306,13 @@ class OrderController {
       if (order.payment.paymentStatus === "Paid") {
          return next(new ErrorHander("Order has been paid", 403));
       }
+      for (let item of order.orderItems) {
+         await VehicleService.checkVehicleAvailable(
+            item.vehicle._id,
+            item.quantity,
+         );
+      }
+      await VehicleService.checkVehicleAvailable();
       var partnerCode = "MOMO";
       var accessKey = process.env.MOMO_ACCESSKEY;
       var secretkey = process.env.MOMO_SECRETKEY;
@@ -364,7 +432,13 @@ class OrderController {
       if (secureHash === signed) {
          //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
          const orderId = req.query.vnp_OrderInfo.split(",")[1];
-         await OrderService.updateOrderPayment(orderId, "VNPAY");
+         const order = await OrderService.updateOrderPayment(orderId, "VNPAY");
+         for (let item of order.orderItems) {
+            await VehicleService.downQuantityVehicle(
+               item.vehicle._id,
+               item.quantity,
+            );
+         }
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
          res.redirect(process.env.LINK_APP_PAYMENT);
          // res.json({
@@ -385,6 +459,12 @@ class OrderController {
       }
       if (order.payment.paymentStatus === "Paid") {
          return next(new ErrorHander("Order has been paid", 403));
+      }
+      for (let item of order.orderItems) {
+         await VehicleService.checkVehicleAvailable(
+            item.vehicle._id,
+            item.quantity,
+         );
       }
       var ipAddr =
          req.headers["x-forwarded-for"] ||
