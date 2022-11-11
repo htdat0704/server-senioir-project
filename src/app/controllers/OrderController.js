@@ -225,10 +225,7 @@ class OrderController {
    momoSuccess = async (req, res, next) => {
       try {
          const { extraData } = req.query;
-         const order = await OrderService.updateOrderPayment(
-            extraData.toString(),
-            "MOMO",
-         );
+         await OrderService.updateOrderPayment(extraData.toString(), "MOMO");
          res.redirect(process.env.LINK_APP_PAYMENT);
 
          // res.json({
@@ -381,7 +378,14 @@ class OrderController {
       }
    };
 
-   sendVNPay = (req, res, next) => {
+   sendVNPay = async (req, res, next) => {
+      const order = await OrderService.findById(req.body.orderId);
+      if (!order) {
+         return next(new ErrorHander("Order not Found"), 404);
+      }
+      if (order.payment.paymentStatus === "Paid") {
+         return next(new ErrorHander("Order has been paid", 403));
+      }
       var ipAddr =
          req.headers["x-forwarded-for"] ||
          req.connection.remoteAddress ||
@@ -397,7 +401,7 @@ class OrderController {
 
       var createDate = dateFormat(date, "yyyymmddHHmmss");
       var orderId = dateFormat(date, "HHmmss");
-      var amount = req.body.amount;
+      var amount = order.totalPrice;
       var bankCode = "";
 
       var orderInfo = req.body.name;
@@ -436,8 +440,12 @@ class OrderController {
       var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
       vnp_Params["vnp_SecureHash"] = signed;
       vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
-      console.log(vnpUrl);
-      res.redirect(vnpUrl);
+
+      // res.redirect(vnpUrl);
+
+      res.json({
+         vnpUrl,
+      });
    };
 }
 
