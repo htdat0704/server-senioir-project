@@ -28,6 +28,12 @@ exports.registerUser = (
          public_id: idImage,
          url: avatar,
       },
+      notification: [
+         {
+            typeNotif: "Account",
+            content: "Register Success! Welcome to Datoto " + name,
+         },
+      ],
    });
    return user.save();
 };

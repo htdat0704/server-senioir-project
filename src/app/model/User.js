@@ -102,6 +102,25 @@ const UserSchema = new mongoose.Schema({
       type: Date,
       default: Date.now(),
    },
+   notification: [
+      {
+         typeNotif: {
+            type: String,
+            enum: ["Vehicle", "Order", "Account", "Add", "News"],
+         },
+         content: {
+            type: String,
+         },
+         seen: {
+            type: Number,
+            default: 0,
+         },
+         createdAt: {
+            type: Date,
+            default: Date.now(),
+         },
+      },
+   ],
 });
 
 module.exports = mongoose.model("users", UserSchema);
