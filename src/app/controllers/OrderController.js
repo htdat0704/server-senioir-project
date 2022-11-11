@@ -243,7 +243,7 @@ class OrderController {
       try {
          req.body.user = req.user._id;
 
-         for (let item of body.orderItems) {
+         for (let item of req.body.orderItems) {
             await VehicleService.checkVehicleAvailable(
                item.vehicle._id,
                item.quantity,
