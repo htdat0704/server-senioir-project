@@ -337,13 +337,13 @@ class OrderController {
       if (order.payment.paymentStatus === "Paid") {
          return next(new ErrorHander("Order has been paid", 403));
       }
+
       for (let item of order.orderItems) {
          await VehicleService.checkVehicleAvailable(
             item.vehicle._id,
             item.quantity,
          );
       }
-      await VehicleService.checkVehicleAvailable();
       var partnerCode = "MOMO";
       var accessKey = process.env.MOMO_ACCESSKEY;
       var secretkey = process.env.MOMO_SECRETKEY;
