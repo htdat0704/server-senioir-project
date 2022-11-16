@@ -138,6 +138,9 @@ class OrderController {
    updateOrder = async (req, res, next) => {
       try {
          let order = await OrderService.findById(req.params.id);
+
+         const orderStatusBeforeUpdate = order.orderStatus;
+
          if (req.body.overtimeHour) {
             req.body.overtimeFee =
                order.orderItems.reduce(
@@ -221,7 +224,10 @@ class OrderController {
             }
          }
 
-         if (order.orderStatus === "Success") {
+         if (
+            order.orderStatus === "Success" &&
+            orderStatusBeforeUpdate !== "Success"
+         ) {
             for (let item of order.orderItems) {
                await VehicleService.increaseQuantityVehicle(
                   item.vehicle._id,
@@ -230,13 +236,15 @@ class OrderController {
             }
          }
 
-         await UserService.addNotification(
-            order.user._id,
-            "Order",
-            "Your order Status has been change to " +
-               order.orderStatus +
-               ", Enjoy the ride!",
-         );
+         if (order.orderStatus !== orderStatusBeforeUpdate) {
+            await UserService.addNotification(
+               order.user._id,
+               "Order",
+               "Your order Status has been change to " +
+                  order.orderStatus +
+                  ", Enjoy the ride!",
+            );
+         }
 
          res.json({
             success: true,
@@ -329,13 +337,14 @@ class OrderController {
       if (order.payment.paymentStatus === "Paid") {
          return next(new ErrorHander("Order has been paid", 403));
       }
+
       for (let item of order.orderItems) {
          await VehicleService.checkVehicleAvailable(
             item.vehicle._id,
-            item.quantity,
+            +item.quantity,
          );
       }
-      await VehicleService.checkVehicleAvailable();
+
       var partnerCode = "MOMO";
       var accessKey = process.env.MOMO_ACCESSKEY;
       var secretkey = process.env.MOMO_SECRETKEY;
