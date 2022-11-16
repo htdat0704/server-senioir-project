@@ -341,9 +341,10 @@ class OrderController {
       for (let item of order.orderItems) {
          await VehicleService.checkVehicleAvailable(
             item.vehicle._id,
-            item.quantity,
+            +item.quantity,
          );
       }
+
       var partnerCode = "MOMO";
       var accessKey = process.env.MOMO_ACCESSKEY;
       var secretkey = process.env.MOMO_SECRETKEY;
