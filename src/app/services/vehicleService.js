@@ -225,7 +225,7 @@ exports.addVehicleReview = async (vehicleId, review) => {
    return Vehicle.findById(vehicleId).populate("reviews.user", "avatar name");
 };
 
-exports.findAllVehicleReview = async (resultPerPage = 0) => {
+exports.findAllVehicleReview = async () => {
    const vehicles = await Vehicle.find()
       .populate("reviews.user", "avatar name")
       .sort({ _id: -1 })
@@ -353,7 +353,7 @@ exports.deleteFeature = value => {
 exports.checkVehicleAvailable = async (vehicleId, quantity) => {
    const vehicle = await Vehicle.findById(vehicleId);
    if (vehicle.quantity === 0) {
-      throw new Error("Vehicle is not available");
+      throw new Error("Vehicle " + vehicle.name + " is not available");
    }
    if (vehicle.quantity < +quantity) {
       throw new Error("Vehicle is not enough");

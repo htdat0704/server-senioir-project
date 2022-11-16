@@ -64,6 +64,27 @@ router.put(
    UserController.updateUserAdmin,
 );
 
+router.post(
+   "/notifications/add",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.addNotification,
+);
+
+router.delete(
+   "/notifications/delete",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.deleteNotification,
+);
+
+router.get(
+   "/notifications",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.findAllNotification,
+);
+
 // // router.get('/details/:id', UserController.detailsProduct);
 // // router.get('/', UserController.getAllProduct);
 

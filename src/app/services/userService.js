@@ -38,6 +38,51 @@ exports.registerUser = (
    return user.save();
 };
 
+exports.addNotification = async (userId, typeNotif, content) => {
+   const user = await User.findById(userId);
+   if (!user) {
+      throw new Error("User not found");
+   }
+   user.notification.push({ typeNotif, content });
+   await user.save({ validateBeforeSave: false });
+};
+
+exports.findAllNotification = async () => {
+   const users = await User.find().sort({ _id: -1 }).lean();
+
+   let AllNotifications = [];
+
+   users.map(user => {
+      user.notification &&
+         user.notification.map(notif => {
+            notif.username = user.name;
+            notif.userId = user._id;
+            AllNotifications.push(notif);
+         });
+   });
+
+   return AllNotifications;
+};
+
+exports.deleteNotification = async (userId, notifId) => {
+   if (!userId || !notifId) {
+      throw new Error("User or Notification Not Found");
+   }
+   const user = await User.findById(userId).lean();
+
+   if (!user) {
+      throw new Error("User not found");
+   }
+
+   const notification = user.notification.filter(
+      notif => notif._id.toString() !== notifId,
+   );
+
+   return User.findByIdAndUpdate(userId, {
+      notification,
+   });
+};
+
 exports.foundUserWithPassowrd = email => {
    return User.findOne({ email: email }).select("+password");
 };
@@ -193,4 +238,11 @@ exports.countUser = async () => {
                   new Date().getFullYear(),
          ).length ?? 0,
    };
+};
+
+exports.checkAvailableNumber = async userId => {
+   const user = await User.findById(userId).select("phoneNumber");
+   if (!user.phoneNumber) {
+      throw new Error("Please update your phone Number");
+   }
 };
