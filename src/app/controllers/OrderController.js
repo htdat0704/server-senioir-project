@@ -230,6 +230,14 @@ class OrderController {
             }
          }
 
+         await UserService.addNotification(
+            order.user._id,
+            "Order",
+            "Your order Status has been change to " +
+               order.orderStatus +
+               ", Enjoy the ride!",
+         );
+
          res.json({
             success: true,
             order,
@@ -243,14 +251,22 @@ class OrderController {
       try {
          req.body.user = req.user._id;
 
+         await UserService.checkAvailableNumber(req.user._id);
+
          for (let item of req.body.orderItems) {
             await VehicleService.checkVehicleAvailable(
-               item.vehicle._id,
+               item.vehicle,
                item.quantity,
             );
          }
 
          let order = await OrderService.createOrder(req.body);
+
+         await UserService.addNotification(
+            req.user._id,
+            "Order",
+            "Your order has been created, Enjoy the ride!",
+         );
 
          res.json({
             order,
@@ -287,6 +303,13 @@ class OrderController {
                item.quantity,
             );
          }
+
+         await UserService.addNotification(
+            order.user._id,
+            "Order",
+            "Your order has been paid by MOMO, Enjoy the ride!",
+         );
+
          res.redirect(process.env.LINK_APP_PAYMENT);
 
          // res.json({
@@ -439,6 +462,11 @@ class OrderController {
                item.quantity,
             );
          }
+         await UserService.addNotification(
+            order.user._id,
+            "Order",
+            "Your order has been paid by VNPAY, Enjoy the ride!",
+         );
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
          res.redirect(process.env.LINK_APP_PAYMENT);
          // res.json({

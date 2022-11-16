@@ -154,6 +154,12 @@ class UserController {
 
          await UserService.resetPassword(req.userId, hashedPassword);
 
+         await UserService.addNotification(
+            req.userId,
+            "Account",
+            "Your password has just been reset!",
+         );
+
          res.json({
             success: true,
             message: "login now!",
@@ -215,6 +221,12 @@ class UserController {
             hashPassowrd,
          );
 
+         await UserService.addNotification(
+            userFound._id,
+            "Account",
+            "Your password have been change!",
+         );
+
          res.json({
             success: true,
             user: userFound,
@@ -227,6 +239,12 @@ class UserController {
    updateProfile = async (req, res, next) => {
       try {
          const user = await UserService.updateProfile(req.user._id, req.body);
+
+         await UserService.addNotification(
+            user._id,
+            "Account",
+            "Your profile have been update!",
+         );
 
          res.json({
             success: true,
@@ -329,6 +347,54 @@ class UserController {
          );
 
          sendToken(userFound, accessToken, res);
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   addNotification = async (req, res, next) => {
+      try {
+         if (req.body.user.length === 0) {
+            return next(new ErrorHander("No users have been selected", 400));
+         }
+         for (let userId of req.body.user) {
+            await UserService.addNotification(
+               userId,
+               req.body.type,
+               req.body.content,
+            );
+         }
+         res.json({
+            allNotifications: await UserService.findAllNotification(),
+            message: "Add notifications success!",
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   deleteNotification = async (req, res, next) => {
+      try {
+         await UserService.deleteNotification(
+            req.body.userId,
+            req.body.notifId,
+         );
+         res.json({
+            success: true,
+            message: "Delete success",
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   findAllNotification = async (req, res, next) => {
+      try {
+         res.json({
+            allNotifications: await UserService.findAllNotification(),
+            success: true,
+         });
       } catch (e) {
          return next(new ErrorHander(e, 400));
       }
