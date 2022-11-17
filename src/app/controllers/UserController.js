@@ -2,6 +2,7 @@ const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const cloundinary = require("cloudinary");
 const passport = require("passport");
+var fs = require("fs");
 
 const UserService = require("../services/userService");
 const VehicleService = require("../services/vehicleService");
@@ -238,6 +239,10 @@ class UserController {
 
    updateProfile = async (req, res, next) => {
       try {
+         const { image } = req.files;
+         req.body.avatar =
+            `data:image/png;base64,` + image.data.toString("base64");
+
          const user = await UserService.updateProfile(req.user._id, req.body);
 
          await UserService.addNotification(
