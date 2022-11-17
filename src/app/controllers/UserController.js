@@ -239,11 +239,11 @@ class UserController {
 
    updateProfile = async (req, res, next) => {
       try {
-         const { image } = req.files;
-         req.body.avatar =
-            `data:image/png;base64,` + image.data.toString("base64");
+         // const { image } = req.files;
+         // req.body.avatar =
+         //    `data:image/png;base64,` + image.data.toString("base64");
 
-         const user = await UserService.updateProfile(req.user._id, req.body);
+         // const user = await UserService.updateProfile(req.user._id, req.body);
 
          await UserService.addNotification(
             user._id,
