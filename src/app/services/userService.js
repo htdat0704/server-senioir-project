@@ -160,7 +160,8 @@ exports.updateProfile = async (idUser, bodyUpdate) => {
       let user = await User.findById(idUser);
 
       await cloudinary.v2.uploader.destroy(user.avatar.public_id);
-      const myCloud = await cloudinary.v2.uploader.upload(bodyUpdate.avatar, {
+
+      const myCloud = await cloudinary.v2.uploader.upload(bodyUpdate.image, {
          folder: "avatars",
          width: 240,
          crop: "scale",
