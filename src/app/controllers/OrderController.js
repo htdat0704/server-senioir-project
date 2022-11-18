@@ -330,19 +330,23 @@ class OrderController {
    };
 
    sendmomo = async (req, res, next) => {
-      const order = await OrderService.findById(req.body.orderId);
-      if (!order) {
-         return next(new ErrorHander("Order not Found"), 404);
-      }
-      if (order.payment.paymentStatus === "Paid") {
-         return next(new ErrorHander("Order has been paid", 403));
-      }
+      try {
+         const order = await OrderService.findById(req.body.orderId);
+         if (!order) {
+            return next(new ErrorHander("Order not Found"), 404);
+         }
+         if (order.payment.paymentStatus === "Paid") {
+            return next(new ErrorHander("Order has been paid", 403));
+         }
 
-      for (let item of order.orderItems) {
-         await VehicleService.checkVehicleAvailable(
-            item.vehicle._id,
-            +item.quantity,
-         );
+         for (let item of order.orderItems) {
+            await VehicleService.checkVehicleAvailable(
+               item.vehicle._id,
+               +item.quantity,
+            );
+         }
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
       }
 
       var partnerCode = "MOMO";
@@ -490,19 +494,25 @@ class OrderController {
    };
 
    sendVNPay = async (req, res, next) => {
-      const order = await OrderService.findById(req.body.orderId);
-      if (!order) {
-         return next(new ErrorHander("Order not Found"), 404);
+      try {
+         const order = await OrderService.findById(req.body.orderId);
+         if (!order) {
+            return next(new ErrorHander("Order not Found"), 404);
+         }
+         if (order.payment.paymentStatus === "Paid") {
+            return next(new ErrorHander("Order has been paid", 403));
+         }
+
+         for (let item of order.orderItems) {
+            await VehicleService.checkVehicleAvailable(
+               item.vehicle._id,
+               +item.quantity,
+            );
+         }
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
       }
-      if (order.payment.paymentStatus === "Paid") {
-         return next(new ErrorHander("Order has been paid", 403));
-      }
-      for (let item of order.orderItems) {
-         await VehicleService.checkVehicleAvailable(
-            item.vehicle._id,
-            item.quantity,
-         );
-      }
+
       var ipAddr =
          req.headers["x-forwarded-for"] ||
          req.connection.remoteAddress ||
