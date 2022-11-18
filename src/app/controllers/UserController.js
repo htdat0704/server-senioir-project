@@ -379,10 +379,23 @@ class UserController {
 
    deleteNotification = async (req, res, next) => {
       try {
-         await UserService.deleteNotification(
-            req.body.userId,
-            req.body.notifId,
-         );
+         if (!req.body) {
+            return next(new ErrorHander("Notification not found", 402));
+         }
+         if (req.body && req.body.length === 0) {
+            return next(new ErrorHander("Notification not found", 402));
+         }
+         for (let item of req.body) {
+            let itemArr = item.split(",");
+            await UserService.deleteNotification(
+               itemArr[0].trim(),
+               itemArr[1].trim(),
+            );
+         }
+         // await UserService.deleteNotification(
+         //    req.body.userId,
+         //    req.body.notifId,
+         // );
          res.json({
             success: true,
             message: "Delete success",
