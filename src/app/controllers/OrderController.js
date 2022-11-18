@@ -330,8 +330,8 @@ class OrderController {
    };
 
    sendmomo = async (req, res, next) => {
+      const order = await OrderService.findById(req.body.orderId);
       try {
-         const order = await OrderService.findById(req.body.orderId);
          if (!order) {
             return next(new ErrorHander("Order not Found"), 404);
          }
@@ -494,8 +494,8 @@ class OrderController {
    };
 
    sendVNPay = async (req, res, next) => {
+      const order = await OrderService.findById(req.body.orderId);
       try {
-         const order = await OrderService.findById(req.body.orderId);
          if (!order) {
             return next(new ErrorHander("Order not Found"), 404);
          }
