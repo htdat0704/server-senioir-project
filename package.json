@@ -6,6 +6,7 @@
    "scripts": {
       "start": "node src/index.js",
       "dev": "nodemon src/index.js",
+      "build": "build",
       "run": "nodemon --inspect src/index.js",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
@@ -26,6 +27,7 @@
       "express": "^4.18.1",
       "express-fileupload": "^1.4.0",
       "husky": "^8.0.1",
+      "js-recommender": "^1.0.5",
       "jsonwebtoken": "^8.5.1",
       "lint-staged": "^13.0.3",
       "moment-timezone": "^0.5.38",
