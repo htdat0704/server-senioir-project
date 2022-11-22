@@ -121,7 +121,7 @@ class UserController {
          if (!userFound) {
             return next(new ErrorHander("Email not found", 400));
          }
-         const requestPasswordUrl = `${process.env.URLWEBSITE_RESETPASSWORD}/password/reset/${random}`;
+         const requestPasswordUrl = `${process.env.URL_RESETPASSWORD}/password/reset/${random}`;
          const message = `Your password reset token is :- \n\n ${requestPasswordUrl} \n\n If you have not requested this email then, please ignore it`;
 
          userFound = await UserService.resetPasswordToken(email, random);
