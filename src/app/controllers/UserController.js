@@ -114,15 +114,14 @@ class UserController {
    forgetPassword = async (req, res, next) => {
       try {
          const { email } = req.body;
+         const random = Math.floor(Math.random() * 100000000000000000);
 
          let userFound = await UserService.findByEmail(email);
 
          if (!userFound) {
             return next(new ErrorHander("Email not found", 400));
          }
-
-         const random = Math.floor(Math.random() * 100000000000000000);
-         const requestPasswordUrl = `${process.env.URL_WEBSITE_RESET_PASSWORD}/password/reset/${random}`;
+         const requestPasswordUrl = `${process.env.URL_RESETPASSWORD}/password/reset/${random}`;
          const message = `Your password reset token is :- \n\n ${requestPasswordUrl} \n\n If you have not requested this email then, please ignore it`;
 
          userFound = await UserService.resetPasswordToken(email, random);
