@@ -11,7 +11,7 @@ const sortObject = require("../../utils/sortObject");
 class OrderController {
    getAllOrders = async (req, res, next) => {
       try {
-         const orders = await OrderService.findAll();
+         const orders = await OrderService.findAll(req.params.kind);
          res.json({
             orders,
             success: true,

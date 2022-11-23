@@ -9,7 +9,7 @@ const {
 const OrderController = require("../app/controllers/OrderController");
 
 router.get(
-   "/list",
+   "/list/:kind",
    isAuthenticatedUser,
    authorizeRole("admin"),
    OrderController.getAllOrders,

@@ -9,6 +9,7 @@ exports.createOrder = bodyCreate => {
    if (bodyCreate.orderItems.length === 0) {
       throw new Error("No Item have been selected");
    }
+   console.log(new Date(bodyCreate.fromDate).toLocaleTimeString());
    const order = new Order(bodyCreate);
    return order.save();
 };
@@ -28,13 +29,42 @@ exports.findByUser = userId => {
       .sort({ _id: -1 });
 };
 
-exports.findAll = () => {
-   return Order.find()
+exports.findAll = async kind => {
+   const orders = await Order.find()
       .populate("orderItems.vehicle", "name price overtimeFee")
       .populate("user", "name phoneNumber")
       .populate("facility", "name")
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .lean();
+
+   switch (kind) {
+      case "fromDate":
+         return orders.filter(
+            order =>
+               new Date(order.fromDate).getDate() === new Date().getDate() &&
+               new Date(order.fromDate).getMonth() === new Date().getMonth() &&
+               new Date(order.fromDate).getFullYear() ===
+                  new Date().getFullYear(),
+         );
+      case "endDate":
+         return orders.filter(
+            order =>
+               new Date(order.endDate).getDate() === new Date().getDate() &&
+               new Date(order.endDate).getMonth() === new Date().getMonth() &&
+               new Date(order.endDate).getFullYear() ===
+                  new Date().getFullYear(),
+         );
+      case "today":
+         return orders.filter(
+            order =>
+               new Date(order.createdAt).getDate() === new Date().getDate() &&
+               new Date(order.createdAt).getMonth() === new Date().getMonth() &&
+               new Date(order.createdAt).getFullYear() ===
+                  new Date().getFullYear(),
+         );
+      default:
+         return orders;
+   }
 };
 
 exports.updateOrder = (orderId, bodyUpdate) => {
