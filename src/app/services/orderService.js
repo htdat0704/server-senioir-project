@@ -9,8 +9,12 @@ exports.createOrder = bodyCreate => {
    if (bodyCreate.orderItems.length === 0) {
       throw new Error("No Item have been selected");
    }
-   console.log(new Date().toLocaleTimeString());
-   if (new Date().getTime() > new Date(bodyCreate.fromDate).getTime()) {
+   console.log(new Date());
+   console.log(new Date(new Date(bodyCreate.fromDate)));
+   if (
+      new Date().getTime() >
+      new Date(bodyCreate.fromDate).getTime() - 25200000
+   ) {
       throw new Error("Cannot choose a date in the past");
    }
    const order = new Order(bodyCreate);
