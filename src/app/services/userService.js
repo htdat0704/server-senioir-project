@@ -38,10 +38,22 @@ exports.registerUser = (
    return user.save();
 };
 
-exports.addNotification = async (userId, typeNotif, content) => {
+exports.addNotification = async (
+   userId,
+   typeNotif,
+   content,
+   orderId = null,
+) => {
    const user = await User.findById(userId);
    if (!user) {
       throw new Error("User not found");
+   }
+   if (orderId) {
+      const order = await Order.findById(orderId);
+      if (!order) {
+         throw new Error("Order not found");
+      }
+      user.notification.push({ typeNotif, content, order: orderId });
    }
    user.notification.push({ typeNotif, content });
    await user.save({ validateBeforeSave: false });
@@ -94,7 +106,7 @@ exports.deleteNotification = async (userId, notifId) => {
    }
 
    const notification = user.notification.filter(
-      notif => notif._id.toString() !== notifId,
+      notif => notif._id.toString() !== notifId.toString(),
    );
 
    return User.findByIdAndUpdate(userId, {
