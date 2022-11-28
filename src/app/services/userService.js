@@ -47,6 +47,25 @@ exports.addNotification = async (userId, typeNotif, content) => {
    await user.save({ validateBeforeSave: false });
 };
 
+exports.updateSeenNotification = async (userId, notifId) => {
+   const user = await User.findById(userId).lean();
+   if (!user) {
+      throw new Error("User not found");
+   }
+   const newNotification = user.notification.map(notif =>
+      notif._id.toString() === notifId.toString()
+         ? { ...notif, seen: 1 }
+         : notif,
+   );
+   return User.findByIdAndUpdate(
+      userId,
+      {
+         notification: newNotification,
+      },
+      { new: true },
+   );
+};
+
 exports.findAllNotification = async () => {
    const users = await User.find().sort({ _id: -1 }).lean();
 

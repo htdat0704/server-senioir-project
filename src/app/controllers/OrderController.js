@@ -1,6 +1,5 @@
 const crypto = require("crypto");
 const dateFormat = require("dateformat");
-const argon2 = require("argon2");
 
 const OrderService = require("../services/orderService");
 const UserService = require("../services/userService");
@@ -292,6 +291,22 @@ class OrderController {
          res.json({
             order,
             success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   addNewNotification = async (req, res, next) => {
+      try {
+         await UserService.addNotification(
+            req.body.userId,
+            "Order",
+            req.body.content,
+         );
+         res.json({
+            success: true,
+            message: "Add notification Success",
          });
       } catch (e) {
          return next(new ErrorHander(e, 400));

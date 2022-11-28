@@ -21,6 +21,13 @@ router.get("/myOrders", isAuthenticatedUser, OrderController.myOrders);
 
 router.get("/:id", isAuthenticatedUser, OrderController.getOneOrder);
 
+router.post(
+   "/notification/add",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   OrderController.addNewNotification,
+);
+
 router.get(
    "/dashboard/revenue/:year",
    isAuthenticatedUser,

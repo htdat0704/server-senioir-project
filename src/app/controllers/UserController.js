@@ -414,6 +414,21 @@ class UserController {
          return next(new ErrorHander(e, 400));
       }
    };
+
+   seenNotification = async (req, res, next) => {
+      try {
+         res.json({
+            message: "Update Success",
+            success: true,
+            user: await UserService.updateSeenNotification(
+               req.body.userId,
+               req.body.notifId,
+            ),
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
 }
 
 module.exports = new UserController();
