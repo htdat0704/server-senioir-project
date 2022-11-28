@@ -242,6 +242,7 @@ class OrderController {
                "Your order Status has been change to " +
                   order.orderStatus +
                   ", Enjoy the ride!",
+               order._id,
             );
          }
 
@@ -303,6 +304,7 @@ class OrderController {
             req.body.userId,
             "Order",
             req.body.content,
+            req.body.orderId,
          );
          res.json({
             success: true,
