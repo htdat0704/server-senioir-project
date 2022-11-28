@@ -78,6 +78,13 @@ router.delete(
    UserController.deleteNotification,
 );
 
+router.put(
+   "/notifications/updateSeen",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.seenNotification,
+);
+
 router.get(
    "/notifications",
    isAuthenticatedUser,
