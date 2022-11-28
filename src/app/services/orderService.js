@@ -9,7 +9,10 @@ exports.createOrder = bodyCreate => {
    if (bodyCreate.orderItems.length === 0) {
       throw new Error("No Item have been selected");
    }
-   console.log(new Date(bodyCreate.fromDate).toLocaleTimeString());
+   console.log(new Date().toLocaleTimeString());
+   if (new Date().getTime() > new Date(bodyCreate.fromDate).getTime()) {
+      throw new Error("Cannot choose a date in the past");
+   }
    const order = new Order(bodyCreate);
    return order.save();
 };
@@ -34,7 +37,7 @@ exports.findAll = async kind => {
       .populate("orderItems.vehicle", "name price overtimeFee")
       .populate("user", "name phoneNumber")
       .populate("facility", "name")
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .lean();
 
    switch (kind) {
