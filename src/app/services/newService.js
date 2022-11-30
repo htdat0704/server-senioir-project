@@ -31,6 +31,8 @@ exports.deleteNew = async id => {
       if (!newD) {
          throw new Error("New not found");
       }
+
+      await cloudinary.v2.uploader.destroy(newD.image.public_id);
       newD.delete();
    } catch (e) {
       throw new Error("New not found");
