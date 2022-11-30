@@ -126,17 +126,17 @@ exports.userLastOrders = userId => {
    return Order.find({
       user: userId,
    })
-      .select("orderStatus totalPrice fromDate endDate payment")
-      .sort({ fromDate: -1 })
+      .select("orderStatus totalPrice fromDate endDate payment createdAt")
+      .sort({ createdAt: -1 })
       .limit(10);
 };
 
 exports.vehicleLastOrders = async vehicleId => {
    let orders = await Order.find()
       .lean()
-      .select("orderStatus fromDate endDate payment orderItems user")
+      .select("orderStatus fromDate endDate payment orderItems user createdAt")
       .populate("user", "name phoneNumber avatar")
-      .sort({ fromDate: -1 });
+      .sort({ createdAt: -1 });
 
    orders = orders.filter(order => {
       let output = false;
@@ -162,7 +162,9 @@ exports.facilityLastOrders = facilityId => {
    })
       .lean()
       .limit(25)
-      .select("orderStatus fromDate endDate payment facility user totalPrice")
+      .select(
+         "orderStatus fromDate endDate payment facility user totalPrice createdAt",
+      )
       .populate("user", "name phoneNumber avatar")
       .sort({ fromDate: -1 });
 };
