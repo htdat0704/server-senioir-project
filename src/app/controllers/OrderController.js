@@ -335,7 +335,7 @@ class OrderController {
             "Your order has been paid by MOMO, Enjoy the ride!",
          );
 
-         res.redirect(process.env.LINK_APP_PAYMENT);
+         res.redirect(process.env.LINK_APP_PAYMENT + order._id);
 
          // res.json({
          //    order,
@@ -498,7 +498,7 @@ class OrderController {
             "Your order has been paid by VNPAY, Enjoy the ride!",
          );
          // res.render("success", { code: vnp_Params["vnp_ResponseCode"] });
-         res.redirect(process.env.LINK_APP_PAYMENT);
+         res.redirect(process.env.LINK_APP_PAYMENT + order._id);
          // res.json({
          //    success: "success",
          //    code: { code: vnp_Params["vnp_ResponseCode"] },

@@ -9,20 +9,6 @@ const {
 
 const UserController = require("../app/controllers/UserController");
 
-router.post("/register", UserController.register);
-
-router.post("/login", UserController.login);
-
-router.post("/admin/login", UserController.loginAdmin);
-router.get(
-   "/admin/details",
-   isAuthenticatedUser,
-   authorizeRole("admin"),
-   UserController.detailsAdmin,
-);
-
-router.get("/logout", UserController.logout);
-
 router.get(
    "/google",
    passport.authenticate("google", { scope: ["profile", "email"] }),
@@ -55,6 +41,21 @@ router.get("/login/fail", (req, res) => {
       message: "login fail",
    });
 });
+
+router.post("/register", UserController.register);
+
+router.post("/login", UserController.login);
+
+router.post("/admin/login", UserController.loginAdmin);
+
+router.get(
+   "/admin/details",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   UserController.detailsAdmin,
+);
+
+router.get("/logout", UserController.logout);
 
 // router.get(
 //    '/admin/user/:id',
