@@ -9,9 +9,13 @@ const newSchema = new mongoose.Schema({
       type: String,
       enum: ["Festival", "Famous Location", "Event"],
    },
-   location: {
+   latitude: {
       type: String,
       required: true,
+   },
+   longitude: {
+      type: String,
+      require: true,
    },
    description: {
       type: String,
