@@ -84,6 +84,10 @@ exports.findAll = async kind => {
    }
 };
 
+exports.ordersAvailableToNotification = () => {
+   return Order.findById("638855182048b68a4f7bea52");
+};
+
 exports.updateOrder = (orderId, bodyUpdate) => {
    return Order.findByIdAndUpdate(orderId, bodyUpdate, { new: true })
       .populate("orderItems.vehicle", "name price overtimeFee images")
