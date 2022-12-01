@@ -20,7 +20,7 @@ exports.createNew = async bodyCreate => {
 
       return New.create(bodyCreate);
    } catch (e) {
-      throw new Error("New not found");
+      throw new Error("Image no Found");
    }
 };
 

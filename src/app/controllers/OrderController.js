@@ -7,6 +7,12 @@ const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
 const sortObject = require("../../utils/sortObject");
 
+var cron = require("node-cron");
+
+cron.schedule("*/30 * * * *", () => {
+   console.log("running a task every minute 30");
+});
+
 class OrderController {
    getAllOrders = async (req, res, next) => {
       try {
