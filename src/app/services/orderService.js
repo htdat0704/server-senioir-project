@@ -85,7 +85,7 @@ exports.findAll = async kind => {
 };
 
 exports.ordersAvailableToNotification = () => {
-   return Order.findById("638855182048b68a4f7bea52");
+   return Order.find().lean();
 };
 
 exports.updateOrder = (orderId, bodyUpdate) => {
