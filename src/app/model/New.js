@@ -7,7 +7,7 @@ const newSchema = new mongoose.Schema({
    },
    typeNew: {
       type: String,
-      enum: ["Festival", "Famous Location", "Event"],
+      enum: ["Festival", "Famous Location", "Event", "Vehicle"],
    },
    latitude: {
       type: String,

@@ -69,6 +69,16 @@ exports.findAll = async kind => {
                new Date(order.createdAt).getFullYear() ===
                   new Date().getFullYear(),
          );
+      case "waitToPickUp":
+         return orders.filter(order => order.orderStatus === "Confirm");
+      case "waitToConfirm":
+         return orders.filter(order => order.orderStatus === "Processing");
+      case "waitToReturn":
+         return orders.filter(order => order.orderStatus === "Going");
+      case "success":
+         return orders.filter(order => order.orderStatus === "Success");
+      case "cancel":
+         return orders.filter(order => order.orderStatus === "Cancel");
       default:
          return orders;
    }
