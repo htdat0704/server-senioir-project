@@ -9,7 +9,11 @@ const sortObject = require("../../utils/sortObject");
 
 var cron = require("node-cron");
 
-cron.schedule("*/30 * * * *", () => {
+cron.schedule("*/5 * * * *", async () => {
+   const orders = await OrderService.ordersAvailableToNotification();
+   console.log(new Date(orders[0].fromDate));
+   console.log("-----");
+   console.log(new Date());
    console.log("running a task every minute 30");
 });
 
