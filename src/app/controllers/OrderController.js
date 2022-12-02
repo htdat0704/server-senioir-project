@@ -8,7 +8,7 @@ const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
 const sortObject = require("../../utils/sortObject");
 
-cron.schedule("*/30 * * * *", async () => {
+cron.schedule("*/25 * * * *", async () => {
    const { ordersGoing = [], ordersConfirm = [] } =
       await OrderService.ordersAvailableToNotification();
 
@@ -18,7 +18,7 @@ cron.schedule("*/30 * * * *", async () => {
    ordersGoing.length > 0 &&
       (await UserService.autoSendNotificationReturnOrder(ordersGoing));
 
-   console.log("...Send...");
+   console.log("....Sending.....");
 });
 
 class OrderController {
