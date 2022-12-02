@@ -285,20 +285,20 @@ exports.autoSendNotificationConfirmOrder = async ordersConfirm => {
       }
       return order;
    });
-   // for (let order of ordersFormNotification) {
-   //    const user = await User.findById(order.user);
-   //    if (!user) {
-   //       throw new Error("User not found");
-   //    }
+   for (let order of ordersFormNotification) {
+      const user = await User.findById(order.user);
+      if (!user) {
+         throw new Error("User not found");
+      }
 
-   //    user.notification.push({
-   //       typeNotif: "Order",
-   //       content: order.message,
-   //       order: order._id,
-   //    });
+      user.notification.push({
+         typeNotif: "Order",
+         content: order.message,
+         order: order._id,
+      });
 
-   //    await user.save({ validateBeforeSave: false });
-   // }
+      await user.save({ validateBeforeSave: false });
+   }
 };
 
 exports.autoSendNotificationReturnOrder = async ordersGoing => {
@@ -309,23 +309,23 @@ exports.autoSendNotificationReturnOrder = async ordersGoing => {
             convertHour(order.endDate);
       } else {
          order.message =
-            "Your return order was" + convertHour(endDate) + " late";
+            "Your return order was" + convertHour(order.endDate) + " late";
       }
       return order;
    });
 
-   // for (let order of ordersFormNotification) {
-   //    const user = await User.findById(order.user);
-   //    if (!user) {
-   //       throw new Error("User not found");
-   //    }
+   for (let order of ordersFormNotification) {
+      const user = await User.findById(order.user);
+      if (!user) {
+         throw new Error("User not found");
+      }
 
-   //    user.notification.push({
-   //       typeNotif: "Order",
-   //       content: order.message,
-   //       order: order._id,
-   //    });
+      user.notification.push({
+         typeNotif: "Order",
+         content: order.message,
+         order: order._id,
+      });
 
-   //    await user.save({ validateBeforeSave: false });
-   // }
+      await user.save({ validateBeforeSave: false });
+   }
 };
