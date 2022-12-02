@@ -13,10 +13,10 @@ cron.schedule("*/30 * * * *", async () => {
       await OrderService.ordersAvailableToNotification();
 
    ordersConfirm.length > 0 &&
-      UserService.autoSendNotificationConfirmOrder(ordersConfirm);
+      (await UserService.autoSendNotificationConfirmOrder(ordersConfirm));
 
    ordersGoing.length > 0 &&
-      UserService.autoSendNotificationReturnOrder(ordersGoing);
+      (await UserService.autoSendNotificationReturnOrder(ordersGoing));
 
    console.log("...Send...");
 });
