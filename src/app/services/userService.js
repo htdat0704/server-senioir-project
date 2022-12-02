@@ -309,7 +309,7 @@ exports.autoSendNotificationReturnOrder = async ordersGoing => {
             convertHour(order.endDate);
       } else {
          order.message =
-            "Your return order was" + convertHour(order.endDate) + " late";
+            "Your return order was " + convertHour(order.endDate) + " late";
       }
       return order;
    });
