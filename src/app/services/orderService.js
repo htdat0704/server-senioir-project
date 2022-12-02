@@ -1,7 +1,12 @@
 const https = require("https");
 
 const Order = require("../model/Order");
-const { subtractionHour } = require("../../utils/methodDate");
+const {
+   subtractionHour,
+   moreThanDateNow,
+   convertHour,
+   equalDateNow,
+} = require("../../utils/methodDate");
 
 exports.createOrder = bodyCreate => {
    if (!bodyCreate.pickUpLocation) {
@@ -109,10 +114,39 @@ exports.ordersAvailableToNotification = async () => {
          subtractionHour(order.fromDate) > 0 &&
          order,
    );
-   return {
-      ordersGoing,
-      ordersConfirm,
-   };
+
+   let ordersFormPickUpNotification = [];
+   let ordersFormReturnNotification = [];
+
+   ordersFormPickUpNotification = ordersConfirm.map(order => {
+      if (moreThanDateNow(order.fromDate)) {
+         order.message =
+            "Your order will pick up in the next " +
+            convertHour(order.fromDate);
+      } else if (equalDateNow(order.fromDate)) {
+         order.message = "Your pick up time has arrvied";
+      } else {
+         order.message =
+            "Your pick up order was " + convertHour(order.fromDate) + " late";
+      }
+      return order;
+   });
+
+   ordersFormReturnNotification = ordersGoing.map(order => {
+      if (moreThanDateNow(order.endDate)) {
+         order.message =
+            "Your order should return in the next " +
+            convertHour(order.endDate);
+      } else if (equalDateNow(order.endDate)) {
+         order.message = "Your return time has arrvied";
+      } else {
+         order.message =
+            "Your return order was " + convertHour(order.endDate) + " late";
+      }
+      return order;
+   });
+
+   return ordersFormPickUpNotification.concat(ordersFormReturnNotification);
 };
 
 exports.updateOrder = (orderId, bodyUpdate) => {

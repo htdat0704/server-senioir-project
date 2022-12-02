@@ -9,14 +9,12 @@ const ErrorHander = require("../../utils/errorhandler");
 const sortObject = require("../../utils/sortObject");
 
 cron.schedule("*/30 * * * *", async () => {
-   const { ordersGoing = [], ordersConfirm = [] } =
+   const ordersFormNotification =
       await OrderService.ordersAvailableToNotification();
 
-   ordersConfirm.length > 0 &&
-      (await UserService.autoSendNotificationConfirmOrder(ordersConfirm));
-
-   ordersGoing.length > 0 &&
-      (await UserService.autoSendNotificationReturnOrder(ordersGoing));
+   if (ordersFormNotification.length > 0) {
+      await UserService.autoSendNotification(ordersFormNotification);
+   }
 
    console.log("....Sending.....");
 });
