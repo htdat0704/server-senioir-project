@@ -384,11 +384,10 @@ class UserController {
          if (req.body && req.body.length === 0) {
             return next(new ErrorHander("Notification not found", 402));
          }
-         console.log(req.body);
+
          for (let item of req.body) {
             let itemArr = item.split(",");
-            console.log(itemArr[1]);
-            console.log(itemArr[0]);
+
             await UserService.deleteNotification(
                itemArr[0].trim(),
                itemArr[1].trim(),

@@ -303,7 +303,7 @@ exports.autoSendNotificationConfirmOrder = async ordersConfirm => {
          order: order._id,
       });
 
-      //await user.save({ validateBeforeSave: false });
+      await user.save({ validateBeforeSave: false });
    }
 };
 
@@ -334,6 +334,6 @@ exports.autoSendNotificationReturnOrder = async ordersGoing => {
          order: order._id,
       });
 
-      //await user.save({ validateBeforeSave: false });
+      await user.save({ validateBeforeSave: false });
    }
 };
