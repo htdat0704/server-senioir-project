@@ -3,7 +3,11 @@ const cloudinary = require("cloudinary");
 const Order = require("../model/Order");
 const Vehicle = require("../model/Vehicle");
 
-const { moreThanDateNow, convertHour } = require("../../utils/methodDate");
+const {
+   moreThanDateNow,
+   convertHour,
+   equalDateNow,
+} = require("../../utils/methodDate");
 const { isVietnamesePhoneNumberValid } = require("../../utils/validate");
 
 exports.findByEmail = email => {
@@ -279,6 +283,8 @@ exports.autoSendNotificationConfirmOrder = async ordersConfirm => {
          order.message =
             "Your order will pick up in the next " +
             convertHour(order.fromDate);
+      } else if (equalDateNow(order.fromDate)) {
+         order.message = "Your pick up time has arrvied";
       } else {
          order.message =
             "Your pick up order was " + convertHour(order.fromDate) + " late";
@@ -307,6 +313,8 @@ exports.autoSendNotificationReturnOrder = async ordersGoing => {
          order.message =
             "Your order should return in the next " +
             convertHour(order.endDate);
+      } else if (equalDateNow(order.endDate)) {
+         order.message = "Your return time has arrvied";
       } else {
          order.message =
             "Your return order was " + convertHour(order.endDate) + " late";
