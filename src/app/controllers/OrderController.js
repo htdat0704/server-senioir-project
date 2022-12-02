@@ -17,6 +17,8 @@ cron.schedule("*/30 * * * *", async () => {
 
    ordersGoing.length > 0 &&
       UserService.autoSendNotificationReturnOrder(ordersGoing);
+
+   console.log("...Send...");
 });
 
 class OrderController {
