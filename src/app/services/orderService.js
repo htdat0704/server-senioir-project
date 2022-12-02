@@ -1,6 +1,7 @@
 const https = require("https");
 
 const Order = require("../model/Order");
+const { subtractionHour } = require("../../utils/methodDate");
 
 exports.createOrder = bodyCreate => {
    if (!bodyCreate.pickUpLocation) {
@@ -83,8 +84,35 @@ exports.findAll = async kind => {
    }
 };
 
-exports.ordersAvailableToNotification = () => {
-   return Order.find().lean();
+exports.ordersAvailableToNotification = async () => {
+   let ordersGoing = await Order.find({
+      orderStatus: "Going",
+   })
+      .select("orderStatus endDate user")
+      .sort({ createdAt: -1 })
+      .lean();
+   let ordersConfirm = await Order.find({
+      orderStatus: "Confirm",
+   })
+      .select("orderStatus fromDate user")
+      .sort({ createdAt: -1 })
+      .lean();
+   ordersGoing = ordersGoing.filter(
+      order =>
+         subtractionHour(order.endDate) <= 3 &&
+         subtractionHour(order.endDate) > 0 &&
+         order,
+   );
+   ordersConfirm = ordersConfirm.filter(
+      order =>
+         subtractionHour(order.fromDate) <= 3 &&
+         subtractionHour(order.fromDate) > 0 &&
+         order,
+   );
+   return {
+      ordersGoing,
+      ordersConfirm,
+   };
 };
 
 exports.updateOrder = (orderId, bodyUpdate) => {
