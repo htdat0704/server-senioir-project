@@ -277,51 +277,7 @@ exports.checkAvailableNumber = async userId => {
    }
 };
 
-exports.autoSendNotificationConfirmOrder = async ordersConfirm => {
-   const ordersFormNotification = ordersConfirm.map(order => {
-      if (moreThanDateNow(order.fromDate)) {
-         order.message =
-            "Your order will pick up in the next " +
-            convertHour(order.fromDate);
-      } else if (equalDateNow(order.fromDate)) {
-         order.message = "Your pick up time has arrvied";
-      } else {
-         order.message =
-            "Your pick up order was " + convertHour(order.fromDate) + " late";
-      }
-      return order;
-   });
-   for (let order of ordersFormNotification) {
-      const user = await User.findById(order.user);
-      if (!user) {
-         throw new Error("User not found");
-      }
-
-      user.notification.push({
-         typeNotif: "Order",
-         content: order.message,
-         order: order._id,
-      });
-
-      await user.save({ validateBeforeSave: false });
-   }
-};
-
-exports.autoSendNotificationReturnOrder = async ordersGoing => {
-   const ordersFormNotification = ordersGoing.map(order => {
-      if (moreThanDateNow(order.endDate)) {
-         order.message =
-            "Your order should return in the next " +
-            convertHour(order.endDate);
-      } else if (equalDateNow(order.endDate)) {
-         order.message = "Your return time has arrvied";
-      } else {
-         order.message =
-            "Your return order was " + convertHour(order.endDate) + " late";
-      }
-      return order;
-   });
-
+exports.autoSendNotification = async ordersFormNotification => {
    for (let order of ordersFormNotification) {
       const user = await User.findById(order.user);
       if (!user) {
