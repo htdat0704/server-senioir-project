@@ -8,7 +8,7 @@ const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
 const sortObject = require("../../utils/sortObject");
 
-cron.schedule("*/25 * * * *", async () => {
+cron.schedule("*/39 * * * *", async () => {
    const { ordersGoing = [], ordersConfirm = [] } =
       await OrderService.ordersAvailableToNotification();
 
