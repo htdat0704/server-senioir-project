@@ -99,13 +99,13 @@ exports.ordersAvailableToNotification = async () => {
       .lean();
    ordersGoing = ordersGoing.filter(
       order =>
-         subtractionHour(order.endDate) <= 3 &&
+         subtractionHour(order.endDate) <= 2 &&
          subtractionHour(order.endDate) > 0 &&
          order,
    );
    ordersConfirm = ordersConfirm.filter(
       order =>
-         subtractionHour(order.fromDate) <= 3 &&
+         subtractionHour(order.fromDate) <= 2 &&
          subtractionHour(order.fromDate) > 0 &&
          order,
    );
