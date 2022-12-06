@@ -54,14 +54,26 @@ exports.updateSeenNotification = async (userId, notifId) => {
    if (!user) {
       throw new Error("User not found");
    }
+
+   let isNotifFound = false;
+
+   user.notification.forEach(notif => {
+      if (notif._id.toString() === notifId.toString()) {
+         isNotifFound = true;
+         return;
+      }
+   });
+
+   if (!isNotifFound) {
+      throw new Error("Notification not found");
+   }
+
    const newNotification = user.notification.map(notif =>
       notif._id.toString() === notifId.toString()
          ? { ...notif, seen: 1 }
          : notif,
    );
-   if (newNotification.length === user.notification.length) {
-      throw new Error("Notification not found");
-   }
+
    return User.findByIdAndUpdate(
       userId,
       {
