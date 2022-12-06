@@ -81,7 +81,6 @@ router.delete(
 router.put(
    "/notifications/updateSeen",
    isAuthenticatedUser,
-   authorizeRole("admin"),
    UserController.seenNotification,
 );
 

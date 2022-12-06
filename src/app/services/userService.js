@@ -3,11 +3,6 @@ const cloudinary = require("cloudinary");
 const Order = require("../model/Order");
 const Vehicle = require("../model/Vehicle");
 
-const {
-   moreThanDateNow,
-   convertHour,
-   equalDateNow,
-} = require("../../utils/methodDate");
 const { isVietnamesePhoneNumberValid } = require("../../utils/validate");
 
 exports.findByEmail = email => {
@@ -64,6 +59,9 @@ exports.updateSeenNotification = async (userId, notifId) => {
          ? { ...notif, seen: 1 }
          : notif,
    );
+   if (newNotification.length === user.notification.length) {
+      throw new Error("Notification not found");
+   }
    return User.findByIdAndUpdate(
       userId,
       {
@@ -214,6 +212,34 @@ exports.deleteUser = async userId => {
       await order.delete();
    }
 
+   for (let vehicle of await Vehicle.find().lean()) {
+      const reviews = vehicle.reviews.filter(
+         rev => rev.user.toString() !== userId,
+      );
+
+      if (reviews.length !== vehicle.reviews.length) {
+         let avg = 0;
+
+         reviews.forEach(rev => {
+            avg += rev.rating;
+         });
+
+         const numOfReviews = reviews.length || 0;
+
+         let ratings = 0;
+
+         if (numOfReviews) {
+            ratings = (avg / reviews.length).toFixed(1);
+         }
+
+         await Vehicle.findByIdAndUpdate(vehicle._id, {
+            reviews,
+            ratings,
+            numOfReviews,
+         });
+      }
+   }
+
    await cloudinary.v2.uploader.destroy(user.avatar.public_id);
    return user.delete();
 };
@@ -292,4 +318,8 @@ exports.autoSendNotification = async ordersFormNotification => {
 
       await user.save({ validateBeforeSave: false });
    }
+};
+
+exports.findAllID = async () => {
+   return await User.find().select("_id");
 };

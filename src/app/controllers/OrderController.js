@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const dateFormat = require("dateformat");
-// var cron = require("node-cron");
+var cron = require("node-cron");
 
 const OrderService = require("../services/orderService");
 const UserService = require("../services/userService");
@@ -8,16 +8,16 @@ const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
 const sortObject = require("../../utils/sortObject");
 
-// cron.schedule("*/30 * * * *", async () => {
-//    const ordersFormNotification =
-//       await OrderService.ordersAvailableToNotification();
+cron.schedule("*/30 * * * *", async () => {
+   const ordersFormNotification =
+      await OrderService.ordersAvailableToNotification();
 
-//    if (ordersFormNotification.length > 0) {
-//       await UserService.autoSendNotification(ordersFormNotification);
-//    }
+   if (ordersFormNotification.length > 0) {
+      await UserService.autoSendNotification(ordersFormNotification);
+   }
 
-//    console.log("....Sending.....");
-// });
+   console.log("....Sending.....");
+});
 
 class OrderController {
    getAllOrders = async (req, res, next) => {

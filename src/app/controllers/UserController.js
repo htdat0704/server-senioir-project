@@ -423,7 +423,7 @@ class UserController {
             message: "Update Success",
             success: true,
             user: await UserService.updateSeenNotification(
-               req.body.userId,
+               req.user._id,
                req.body.notifId,
             ),
          });
