@@ -1,5 +1,17 @@
 const VehicleService = require("../services/vehicleService");
 const ErrorHander = require("../../utils/errorhandler");
+const training = require("../../utils/trainning");
+var cron = require("node-cron");
+
+const { isEmptyObj } = require("../../utils/validate");
+
+let predicted_table = {};
+
+cron.schedule("30 9 * * *", async () => {
+   console.log("...Trainning...");
+   predicted_table = await training();
+   console.log("...END...");
+});
 
 class VehilceController {
    findAllVehicle = async (req, res, next) => {
@@ -186,6 +198,53 @@ class VehilceController {
          await VehicleService.deleteFeature(req.params.value);
 
          res.json({
+            success: true,
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
+   recommendation = async (req, res, next) => {
+      try {
+         let predicted_vehicle = await VehicleService.findTenVehicleBest();
+
+         if (await VehicleService.userIsReview(req.params.id)) {
+            if (!isEmptyObj(predicted_table)) {
+               predicted_vehicle = [];
+               for (var i = 0; i < predicted_table.columnNames.length; ++i) {
+                  var user = predicted_table.columnNames[i];
+
+                  if (user === req.params.id) {
+                     // console.log("For user: " + user);
+                     for (var j = 0; j < predicted_table.rowNames.length; ++j) {
+                        var movie = predicted_table.rowNames[j];
+
+                        predicted_vehicle.push({
+                           _id: movie,
+                           predict: predicted_table.getCell(movie, user),
+                        });
+                     }
+                  }
+
+                  predicted_vehicle.sort((a, b) =>
+                     a.predict > b.predict ? -1 : 1,
+                  );
+               }
+            }
+
+            if (predicted_vehicle.length === 0) {
+               predicted_vehicle = await VehicleService.findTenVehicleBest();
+            }
+         }
+
+         const vehiclesResult = await VehicleService.findTopTenRecommendation(
+            predicted_vehicle,
+         );
+
+         res.json({
+            predicted_vehicle: vehiclesResult,
+            vehicle: await VehicleService.findAllVehicleWithReviewsAndID(),
             success: true,
          });
       } catch (e) {

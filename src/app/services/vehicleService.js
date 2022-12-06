@@ -380,3 +380,43 @@ exports.increaseQuantityVehicle = async (vehicleId, quantity) => {
       { new: true },
    );
 };
+
+exports.userIsReview = async userId => {
+   const vehicles = await Vehicle.find().lean();
+   for (let vehicle of vehicles) {
+      if (vehicle.reviews.length > 0) {
+         for (let review of vehicle.reviews) {
+            if (review.user.toString() === userId) {
+               return true;
+            }
+         }
+      }
+   }
+   return false;
+};
+
+exports.findAllVehicleWithReviewsAndID = async () => {
+   return await Vehicle.find().select("_id reviews").lean();
+};
+
+exports.findTenVehicleBest = async () => {
+   return await Vehicle.find({ quantity: { $gte: "1" } })
+      .select("_id")
+      .limit(10)
+      .sort({ ratings: -1, numberOfRental: -1 });
+};
+
+exports.findTopTenRecommendation = async predictData => {
+   const result = [];
+   let count = 0;
+   while (result.length < 10) {
+      let vehicle = await Vehicle.findById(predictData[count]._id).select(
+         "images name price overtimeFee category ratings brand feature quantity",
+      );
+      if (+vehicle.quantity > 0) {
+         result.push(vehicle);
+      }
+      count += 1;
+   }
+   return result;
+};
