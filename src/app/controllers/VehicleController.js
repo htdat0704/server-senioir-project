@@ -7,7 +7,7 @@ const { isEmptyObj } = require("../../utils/validate");
 
 let predicted_table = {};
 
-cron.schedule("30 9 * * *", async () => {
+cron.schedule("30 10 * * *", async () => {
    console.log("...Trainning...");
    predicted_table = await training();
    console.log("...END...");
