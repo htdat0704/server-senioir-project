@@ -13,6 +13,13 @@ router.get("/list", VehicleController.findAllVehicle);
 router.get("/list/recommendation/:id", VehicleController.recommendation);
 
 router.get(
+   "/admin/training",
+   isAuthenticatedUser,
+   authorizeRole("admin"),
+   VehicleController.training,
+);
+
+router.get(
    "/admin/list",
    isAuthenticatedUser,
    authorizeRole("admin"),

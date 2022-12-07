@@ -14,6 +14,19 @@ cron.schedule(process.env.TIME_TRAINING, async () => {
 });
 
 class VehilceController {
+   training = async (req, res, next) => {
+      try {
+         predicted_table = await training();
+         res.json({
+            predicted_table,
+            success: true,
+            message: "Training Success",
+         });
+      } catch (e) {
+         return next(new ErrorHander(e, 400));
+      }
+   };
+
    findAllVehicle = async (req, res, next) => {
       try {
          let result = { vehicles: "", filterCountProducts: 0, VehicleCount: 0 };
