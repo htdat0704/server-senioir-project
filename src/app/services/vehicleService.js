@@ -410,9 +410,11 @@ exports.findTopTenRecommendation = async predictData => {
    const result = [];
    let count = 0;
    while (result.length < 10) {
-      let vehicle = await Vehicle.findById(predictData[count]._id).select(
-         "images name price overtimeFee category ratings brand feature quantity",
-      );
+      let vehicle = await Vehicle.findById(predictData[count]._id)
+         .select(
+            "images name price overtimeFee category ratings brand feature quantity facility",
+         )
+         .populate("facility", "name location");
       if (+vehicle.quantity > 0) {
          result.push(vehicle);
       }
