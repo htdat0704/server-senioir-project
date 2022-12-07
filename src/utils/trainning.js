@@ -7,6 +7,7 @@ const training = async () => {
    var table = new jsrecommender.Table();
 
    for (let user of await UserService.findAllID()) {
+      console.log("training user " + user._id);
       for (let vehicle of await VehicleService.findAllVehicleWithReviewsAndID()) {
          if (vehicle.reviews.length > 0) {
             for (let review of vehicle.reviews) {
