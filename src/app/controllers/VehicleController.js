@@ -34,11 +34,29 @@ class VehilceController {
          result = await VehicleService.findAllVehicle(
             req.query,
             req.body.resultPerPage,
-            "-seats -color -description -overtimeFee -response -numberOfRental -numOfReviews -reviews -feature",
+            "-seats -color -description -overtimeFee -response -numberOfRental -numOfReviews -reviews",
          );
 
+         if (req.body.feature !== "" && req.body.feature !== undefined) {
+            let features = [];
+
+            req.body.feature.includes(",")
+               ? (features = req.body.feature.split(","))
+               : (features = [req.body.feature]);
+
+            result.vehicles = result.vehicles.filter(vehicle => {
+               for (let feature of features) {
+                  if (vehicle.feature.includes(feature)) {
+                     return true;
+                  }
+               }
+            });
+         }
+
          res.json({
-            ...result,
+            filterCountProducts: result.filterCountProducts,
+            VehicleCount: result.vehicles.length,
+            vehicles: result.vehicles,
             success: true,
          });
       } catch (e) {
