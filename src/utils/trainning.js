@@ -1,6 +1,6 @@
 const VehicleService = require("../app/services/vehicleService");
 const UserService = require("../app/services/userService");
-var jsrecommender = require("js-recommender");
+var jsrecommender = require("../recommendation/recommend");
 
 const training = async () => {
    var recommender = new jsrecommender.Recommender();
@@ -18,12 +18,8 @@ const training = async () => {
                      +review.rating,
                   );
                   break;
-               } else {
-                  table.setCell(vehicle._id.toString(), user._id.toString(), 0);
                }
             }
-         } else {
-            table.setCell(vehicle._id.toString(), user._id.toString(), 0);
          }
       }
    }
