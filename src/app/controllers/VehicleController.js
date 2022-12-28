@@ -239,7 +239,6 @@ class VehilceController {
    recommendation = async (req, res, next) => {
       try {
          let predicted_vehicle = await VehicleService.findTenVehicleBest();
-
          if (await VehicleService.userIsReview(req.params.id)) {
             if (!isEmptyObj(predicted_table)) {
                predicted_vehicle = [];
